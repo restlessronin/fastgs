@@ -1,0 +1,25 @@
+name: fastai-multispectral
+channels:
+- fastai
+- pytorch
+- defaults
+- conda-forge
+dependencies:
+# base
+- python=3.10 # different from colab version
+- pip
+- conda
+- mamba
+- black
+# jupyter
+- notebook
+- ipywidgets
+- jupyter_contrib_nbextensions
+- nb_conda_kernels
+- jupytext
+- nbdev
+#- fastai>=2.7.10
+# experiments
+- wandb
+# geo
+- rasterio

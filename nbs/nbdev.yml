@@ -1,0 +1,9 @@
+project:
+  output-dir: _docs
+
+website:
+  title: "fastai-multispectral"
+  site-url: "https://restlessronin.github.io/fastai-multispectral"
+  description: "multispectral support for fastai"
+  repo-branch: main
+  repo-url: "https://github.com/restlessronin/fastai-multispectral"
