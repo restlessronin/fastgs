@@ -1,4 +1,4 @@
-name: fastai-multispectral
+name: fastai-geospatial
 channels:
 - fastai
 - pytorch
@@ -23,3 +23,5 @@ dependencies:
 - wandb
 # geo
 - rasterio
+# animation
+- ffmpeg
