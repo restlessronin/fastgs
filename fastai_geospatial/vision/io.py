@@ -4,12 +4,11 @@
 from __future__ import annotations
 
 # %% auto 0
-__all__ = ['filter_masked', 'read_chn_file_as_tensor', 'read_multichan_files_as_tensor', 'get_input', 'tile_img_name']
+__all__ = ['filter_masked', 'read_chn_file_as_tensor', 'read_multichan_files_as_tensor', 'get_input', 'tile_img_name',
+           'get_channel_filenames']
 
 # %% ../../nbs/00_vision.io.ipynb 3
 from PIL import Image
-import torch
-import fastai
 from fastai.vision.all import *
 
 # %% ../../nbs/00_vision.io.ipynb 5
@@ -35,3 +34,7 @@ def get_input(stem: str) -> str:
 def tile_img_name(chn_id: str, tile_num: int) -> str:
     "File name from channel id and tile number"
     return f"Sentinel20m-{chn_id}-20200215-{tile_num:03d}.png"
+
+def get_channel_filenames(chn_ids, tile_idx):
+    "Get list of all channel filenames for one tile idx"
+    return [get_input(tile_img_name(x, tile_idx)) for x in chn_ids]

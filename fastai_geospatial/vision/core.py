@@ -6,15 +6,13 @@ from __future__ import annotations
 # %% auto 0
 __all__ = ['TensorImageMS', 'create_TensorImageMS']
 
-# %% ../../nbs/07a_vision.core.ipynb 4
+# %% ../../nbs/07a_vision.core.ipynb 3
 import math
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
 from IPython.display import display, HTML
 
-import torch
-import fastai
 from fastai.vision.all import *
 
 # %% ../../nbs/07a_vision.core.ipynb 6

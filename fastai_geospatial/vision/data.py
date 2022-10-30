@@ -7,8 +7,6 @@ from __future__ import annotations
 __all__ = []
 
 # %% ../../nbs/08a_vision.data.ipynb 3
-import torch
-import fastai
 from fastai.vision.all import *
 
 from .core import *
