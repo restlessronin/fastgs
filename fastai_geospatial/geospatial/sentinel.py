@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 # %% auto 0
-__all__ = ['BandInputs']
+__all__ = ['BandInputs', 'Sentinel2']
 
 # %% ../../nbs/62_geospatial.sentinel.ipynb 3
 from typing import Callable
@@ -38,6 +38,20 @@ def _get_bands(self: BandInputs, ids: list[str]) -> tuple[int]:
 @patch
 def get_bands_list(self: BandInputs, ids_list: list[list[str]]) -> list[tuple[int]]:
     return [self._get_bands(ids) for ids in ids_list]
+
+# %% ../../nbs/62_geospatial.sentinel.ipynb 18
+class Sentinel2:
+    band_ids: list[str] = ["B01","B02","B03","B04","B05","B06","B07","B08","B8A","B09","B10","B11","B12","AOT",]
+    res_m: list[int] = [60,10,10,10,20,20,20,10,20,60,60,20,20,20]
+    brgtX: list[float] = [2.5,4.75,4.25,3.75,3,2,1.7,1.7,2.5,2.5,1.6,1.6,2.2,30,]
+
+    # https://gisgeography.com/sentinel-2-bands-combinations/
+    natural_color = ["B04","B03","B02"]
+    color_infrared = ["B08","B04","B03"]
+    short_wave_infrared = ["B12","B8a","B04"]
+    agriculture = ["B11","B08","B02"]
+    geology = ["B12","B11","B02"]
+    bathymetric = ["B04","B03","B01"]
 
 # %% ../../nbs/62_geospatial.sentinel.ipynb 20
 @patch(cls_method=True)
