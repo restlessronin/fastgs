@@ -2,8 +2,8 @@ project:
   output-dir: _docs
 
 website:
-  title: "fastai-geospatial"
-  site-url: "https://restlessronin.github.io/fastai-geospatial"
+  title: "fastgeo"
+  site-url: "https://restlessronin.github.io/fastgeo"
   description: "multispectral geospatial support for fastai"
   repo-branch: main
-  repo-url: "https://github.com/restlessronin/fastai-geospatial"
+  repo-url: "https://github.com/restlessronin/fastgeo"
