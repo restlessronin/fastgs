@@ -29,7 +29,7 @@ def read_multichan_files_as_tensor(files: list(str)) -> Tensor:
 # %% ../../nbs/00_vision.io.ipynb 7
 def get_input(stem: str) -> str:
     "Get full input path for stem"
-    return "/tmp/input-tiles/" + stem
+    return "/Users/Shared/gengeo/input-tiles/" + stem
 
 def tile_img_name(chn_id: str, tile_num: int) -> str:
     "File name from channel id and tile number"
