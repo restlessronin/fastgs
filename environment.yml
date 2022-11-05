@@ -1,4 +1,4 @@
-name: fastai-geospatial
+name: fastgeo
 channels:
 - fastai
 - pytorch

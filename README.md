@@ -6,7 +6,7 @@ Welcome to `fastai-geospatial`
 ## Install
 
 ``` sh
-pip install fastai_geospatial
+pip install fastgeo
 ```
 
 ## How to use
