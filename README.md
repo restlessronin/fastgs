@@ -6,7 +6,7 @@ Welcome to `fastgeo`
 ## Install
 
 ``` sh
-pip install fastgeo
+pip install fastgs
 ```
 
 ## How to use
