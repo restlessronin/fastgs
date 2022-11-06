@@ -4,6 +4,6 @@ project:
 website:
   title: "fastgeo"
   site-url: "https://restlessronin.github.io/fastgeo"
-  description: "multispectral geospatial support for fastai"
+  description: "Geospatial (especially Multi-Spectral) support for fastai"
   repo-branch: main
   repo-url: "https://github.com/restlessronin/fastgeo"
