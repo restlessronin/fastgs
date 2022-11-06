@@ -48,11 +48,7 @@ d = { 'settings': { 'branch': 'main',
                                                                                    'fastgeo/vision/core.py')},
             'fastgeo.vision.data': {},
             'fastgeo.vision.io': { 'fastgeo.vision.io.filter_masked': ('vision.io.html#filter_masked', 'fastgeo/vision/io.py'),
-                                   'fastgeo.vision.io.get_channel_filenames': ( 'vision.io.html#get_channel_filenames',
-                                                                                'fastgeo/vision/io.py'),
-                                   'fastgeo.vision.io.get_input': ('vision.io.html#get_input', 'fastgeo/vision/io.py'),
                                    'fastgeo.vision.io.read_chn_file_as_tensor': ( 'vision.io.html#read_chn_file_as_tensor',
                                                                                   'fastgeo/vision/io.py'),
                                    'fastgeo.vision.io.read_multichan_files_as_tensor': ( 'vision.io.html#read_multichan_files_as_tensor',
-                                                                                         'fastgeo/vision/io.py'),
-                                   'fastgeo.vision.io.tile_img_name': ('vision.io.html#tile_img_name', 'fastgeo/vision/io.py')}}}
+                                                                                         'fastgeo/vision/io.py')}}}

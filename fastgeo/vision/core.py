@@ -62,7 +62,7 @@ def show(self: TensorImageMS, ctxs=None, **kwargs) -> list:
     ctxs = self._get_grid(1, **kwargs) if ctxs is None else ctxs
     return self._show_tiles(ctxs=ctxs, **kwargs)
 
-# %% ../../nbs/07a_vision.core.ipynb 33
+# %% ../../nbs/07a_vision.core.ipynb 34
 @patch
 def _show_animation(self: TensorImageMS):
     fig, ax = plt.subplots()
