@@ -11,8 +11,8 @@ pip install fastgeo
 
 ## How to use
 
-Fill me in please! Don’t forget code examples:
+TODO
 
 ``` python
-1+1
+#TODO
 ```
