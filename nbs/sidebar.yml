@@ -1,0 +1,8 @@
+website:
+  sidebar:
+    contents:
+      - index.ipynb
+      - 00_vision.io.ipynb
+      - 07a_vision.core.ipynb
+      - 08a_vision.data.ipynb
+      - 62_geospatial.sentinel.ipynb
