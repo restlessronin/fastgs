@@ -25,3 +25,5 @@ dependencies:
 - rasterio
 # animation
 - ffmpeg
+# pypi
+- twine
