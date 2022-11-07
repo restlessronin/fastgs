@@ -84,7 +84,7 @@ def __init__(
     self.files_getter = files_getter
     self.chan_io_fn = chan_io_fn
 
-# %% ../../nbs/62_geospatial.sentinel.ipynb 37
+# %% ../../nbs/62_geospatial.sentinel.ipynb 39
 @patch
 def _load_tensor(self: Sentinel2, img_id, cls: TensorImage) -> TensorImage:
     files = self.files_getter(self.bands.ids, img_id)
