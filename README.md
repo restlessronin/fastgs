@@ -78,7 +78,7 @@ img_12.show()
 ## Acknowledgements
 
 This library is inspired by the following notebooks (and related works
-by the authors) \*
-https://dpird-dma.github.io/blog/Multispectral-image-classification-Transfer-Learning/
-\*
-https://github.com/cordmaur/Fastai2-Medium/blob/master/01_Create_Datablock.ipynb
+by the authors)
+
+- https://dpird-dma.github.io/blog/Multispectral-image-classification-Transfer-Learning/
+- https://github.com/cordmaur/Fastai2-Medium/blob/master/01_Create_Datablock.ipynb
