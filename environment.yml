@@ -27,3 +27,8 @@ dependencies:
 - ffmpeg
 # pypi
 - twine
+# anaconda
+- anaconda-client
+- conda-build
+- conda-verify
+- boa
