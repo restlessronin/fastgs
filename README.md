@@ -16,7 +16,11 @@ library, specifically in the context of Sentinel 2 geospatial imaging.
 ## Install
 
 ``` sh
-pip install fastgs
+pip install -Uqq fastgs
+```
+
+``` sh
+conda install -c restlessronin fastgs
 ```
 
 ## How to use
