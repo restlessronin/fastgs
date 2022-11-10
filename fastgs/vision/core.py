@@ -15,22 +15,23 @@ from IPython.display import display, HTML
 
 from fastai.vision.all import *
 
-# %% ../../nbs/07a_vision.core.ipynb 6
+# %% ../../nbs/07a_vision.core.ipynb 5
 class TensorImageMS(TensorImage):
+    "Class to represent multi-spectral data (more than 3 channels)"
     pass
 
-# %% ../../nbs/07a_vision.core.ipynb 10
+# %% ../../nbs/07a_vision.core.ipynb 9
 @patch
 def num_images(self: TensorImageMS) -> int:
     return len(self.bands)
 
-# %% ../../nbs/07a_vision.core.ipynb 13
+# %% ../../nbs/07a_vision.core.ipynb 12
 @patch
 def _select_bands(self: TensorImageMS, bands: tuple[int]) -> TensorImageMS:
     assert len(bands) <= 3
     return torch.index_select(self, 0, torch.IntTensor(bands))
 
-# %% ../../nbs/07a_vision.core.ipynb 16
+# %% ../../nbs/07a_vision.core.ipynb 15
 @patch
 def _brighten(self: TensorImageMS, brgtX: list[float]) -> TensorImageMS:
     assert self.shape[0] == len(brgtX)
@@ -38,27 +39,27 @@ def _brighten(self: TensorImageMS, brgtX: list[float]) -> TensorImageMS:
     multX = reduce(lambda mX, _: mX.unsqueeze(-1), brdcsts, Tensor(brgtX))
     return torch.clamp(self * multX, 0, 1)
 
-# %% ../../nbs/07a_vision.core.ipynb 22
+# %% ../../nbs/07a_vision.core.ipynb 21
 @patch
 def _show_tiles(self: TensorImageMS, ctxs: list, **kwargs) -> list:
     assert ctxs is not None
     ims: TensorImageMS = [self._select_bands(b)._brighten(m) for b, m in zip(self.bands, self.brgtX)]
     return [show_image(im, ax=ax) for im, ax in zip(ims, ctxs)]
 
-# %% ../../nbs/07a_vision.core.ipynb 24
+# %% ../../nbs/07a_vision.core.ipynb 23
 @patch
 def _get_grid(self: TensorImageMS, nrows: int, **kwargs) -> list:
     ncols = self.num_images()
     ncells = nrows * ncols
     return get_grid(ncells, nrows, ncols, **kwargs)
 
-# %% ../../nbs/07a_vision.core.ipynb 26
+# %% ../../nbs/07a_vision.core.ipynb 25
 @patch
 def show(self: TensorImageMS, ctxs=None, **kwargs) -> list:
     ctxs = self._get_grid(1, **kwargs) if ctxs is None else ctxs
     return self._show_tiles(ctxs=ctxs, **kwargs)
 
-# %% ../../nbs/07a_vision.core.ipynb 33
+# %% ../../nbs/07a_vision.core.ipynb 32
 @patch
 def _show_animation(self: TensorImageMS):
     fig, ax = plt.subplots()

@@ -4,45 +4,21 @@
 from __future__ import annotations
 
 # %% auto 0
-__all__ = ['show_batch', 'show_results']
+__all__ = ['show_batch']
 
 # %% ../../nbs/08a_vision.data.ipynb 3
 from fastai.vision.all import *
-
 from .core import *
 
-# %% ../../nbs/08a_vision.data.ipynb 5
-def _get_grid_batch(nrows: int, ncols: int, figsize=None) -> list:
-    assert nrows is not None and ncols is not None
-    n_cells = nrows * ncols
-    return get_grid(n_cells, nrows=nrows, ncols=ncols, figsize=figsize)
-
 # %% ../../nbs/08a_vision.data.ipynb 6
-def _chunk_grid(ctxs: list, ncols: int) -> list:
-    return [ctxs[pos : pos + ncols] for pos in range(0, len(ctxs), ncols)]
+def _show_one_sample(img: TensorImageMS, msk: TensorMask, row, mskovl, **kwargs):
+    if mskovl:
+        return [msk.show(ctx=c, **kwargs) for c in img.show(ctxs=row, **kwargs)]
+    else:
+        nimgs = img.num_images()
+        return img.show(ctxs=row[:nimgs]) + [msk.show(row[nimgs])]
 
 # %% ../../nbs/08a_vision.data.ipynb 7
-def _show_batch_overlay_mask(
-    x: TensorImageMS,  # Input(s) in the batch
-    y: TensorMask,  # Target(s) in the batch
-    samples: list,  # List of (`x`, `y`) pairs of length `max_n`
-    max_n: int=9,  # Maximum number of `samples` to show
-    figsize=None,
-    **kwargs,
-):
-    assert len(samples[0]) == 2 and not hasattr(samples[0], "show")
-
-    nrows,ncols = min(len(samples),max_n),x.num_images()
-    ctxs = _get_grid_batch(nrows, ncols, figsize=figsize)
-    chks = _chunk_grid(ctxs, ncols)
-    imgs,msks = samples.itemgot(0),samples.itemgot(1)
-
-    return [
-        [msk.show(ctx=c, **kwargs) for c in img.show(ctxs=chk, **kwargs)]
-        for img, msk, chk, _ in zip(imgs, msks, chks, range(nrows))
-    ]
-
-# %% ../../nbs/08a_vision.data.ipynb 8
 @typedispatch
 def show_batch(
     x: TensorImageMS,  # Input(s) in the batch
@@ -53,42 +29,18 @@ def show_batch(
     nrows:int=None,
     ncols:int=None,
     figsize=None,
-    **kwargs,
+    mskovl:bool=True, # mask is overlaid on the image
+    **kwargs
 ):
-    _show_batch_overlay_mask(x,y,samples,max_n,figsize,**kwargs)
-
-# %% ../../nbs/08a_vision.data.ipynb 9
-@typedispatch
-def show_results(
-    x: TensorImageMS,  # Input(s) in the batch
-    y: TensorMask,  # Target(s) in the batch
-    samples: list,  # List of (`x`, `y`) pairs of length `max_n`
-    outs: list,  # List of predicted output(s) from the model
-    ctxs=None,  # List of `ctx` objects to show data. Could be a matplotlib axis, DataFrame, etc.
-    max_n: int=9,  # Maximum number of `samples` to show
-    nrows:int=None,
-    ncols:int=None,
-    figsize=None,
-    **kwargs,
-):
-    assert nrows is None and ncols is None and ctxs is None
     assert len(samples[0]) == 2 and not hasattr(samples[0], "show")
+    assert nrows is None and ncols is None and ctxs is None
 
-    ctxs = get_grid(min(len(samples), max_n), nrows=nrows, ncols=ncols, figsize=figsize)
+    nimgs = x.num_images()
+    nrows = min(len(samples),max_n)
+    ncols = nimgs if mskovl else nimgs + 1
 
-    nrows, ncols = min(len(samples), max_n), x.num_images()
-    ctxs = get_grid_batch(nrows, ncols, figsize=figsize)
-    chks = [ctxs[pos : pos + ncols] for pos in range(0, len(ctxs), ncols)]
+    ctxs = get_grid(nrows * ncols, nrows, ncols, figsize=figsize)
+    rwcx = [ctxs[pos : pos + ncols] for pos in range(0, len(ctxs), ncols)]
+    imgs,msks = samples.itemgot(0),samples.itemgot(1)
 
-    ctxs = [
-        [msk.show(ctx=c, **kwargs) for c in img.show(ctxs=chk, **kwargs)]
-        for img, msk, chk, _ in zip(
-            samples.itemgot(0), samples.itemgot(1), chks, range(nrows)
-        )
-    ]
-    for i in range(len(outs[0])):
-        ctxs = [
-            b.show(ctx=c, **kwargs)
-            for b, c, _ in zip(outs.itemgot(i), ctxs, range(max_n))
-        ]
-    return ctxs
+    return [_show_one_sample(img, msk, row, mskovl) for img, msk, row, _ in zip(imgs, msks, rwcx, range(nrows))]
