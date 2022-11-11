@@ -11,11 +11,11 @@ from fastai.vision.all import *
 from .core import *
 
 # %% ../../nbs/21a_vision.learner.ipynb 6
-def _get_sample_ctxs(nimgs: int, nsamples: int, mskovl: bool, figsize=None):
+def _get_sample_ctxs(nimgs: int, nsamples: int, mskovl: bool, title: str=None, figsize=None):
     nrows = 2 * nsamples if mskovl else nsamples
     ncols = nimgs if mskovl else nimgs + 2
 
-    ctxs = get_grid(nrows * ncols, nrows, ncols, figsize=figsize, title='Ground Truth/Prediction')
+    ctxs = get_grid(nrows * ncols, nrows, ncols, figsize=figsize, title=title)
     chksize = 2 * nimgs if mskovl else nimgs + 2
     return [ctxs[pos : pos + chksize] for pos in range(0, len(ctxs), chksize)]
 
@@ -40,13 +40,7 @@ def show_results(x:TensorImageMS, y:TensorMask, samples, outs, ctxs=None, max_n=
 
 # %% ../../nbs/21a_vision.learner.ipynb 13
 @typedispatch
-def plot_top_losses(x:TensorImageMS, y:TensorMask, samples, outs, raws, losses, nrows=None, ncols=None, figsize=None, **kwargs):
-    axes = get_grid(len(samples)*3, nrows=len(samples), ncols=3, figsize=figsize, flatten=False, title="Input | Target | Prediction")
-    if axes.ndim == 1: axes = (axes,)
-    titles = ["input", "target", "pred"]
-    for axs,s,o,l in zip(axes, samples, outs, losses):
-        imgs = (s[0], s[1], o[0])
-        for ax,im,title in zip(axs, imgs, titles):
-            if title=="pred": title += f"; loss = {l:.4f}"
-            im.show(ctx=ax, **kwargs)
-            ax.set_title(title)
+def plot_top_losses(x:TensorImageMS, y:TensorMask, samples, outs, raws, losses, nrows=None, ncols=None, figsize=None, mskovl: bool=True, **kwargs):
+    assert nrows is None and ncols is None
+    rwcx = _get_sample_ctxs(x.num_images(), len(samples), mskovl, figsize)
+    [_show_one_result(s[0], s[1], o[0], row, mskovl, **kwargs) for row,s,o,l in zip(rwcx, samples, outs, losses)]
