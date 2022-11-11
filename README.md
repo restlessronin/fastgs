@@ -35,25 +35,8 @@ subclass of `fastai` `TensorImage` which itself is a subclass of the
 from fastgs.geospatial.sentinel import *
 ```
 
-If we have the following functions to map an image index to an array of
-channel files
-
-``` python
-def get_input(stem: str) -> str:
-    "Get full input path for stem"
-    return "./images/" + stem
-
-def tile_img_name(chn_id: str, tile_num: int) -> str:
-    "File name from channel id and tile number"
-    return f"Sentinel20m-{chn_id}-20200215-{tile_num:03d}.png"
-
-def get_channel_filenames(chn_ids, tile_idx):
-    "Get list of all channel filenames for one tile idx"
-    return [get_input(tile_img_name(x, tile_idx)) for x in chn_ids]
-```
-
-then the following code creates a class that can load 11 Sentinel 2
-channels into a
+The following code creates a class that can load 11 Sentinel 2 channels
+into a
 [`TensorImageMS`](https://restlessronin.github.io/fastgs/vision.core.html#tensorimagems).
 
 ``` python
@@ -63,7 +46,8 @@ snt_12 = Sentinel2(
     ["B02","B03","B04","B05","B06","B07","B08","B8A","B11","B12","AOT"],
     [Sentinel2.natural_color, ["B07","B06","B05"],["B12","B11","B8A"],["B08"]],
     get_channel_filenames,
-    read_multichan_files
+    read_multichan_files,
+    read_mask_file
 )
 ```
 
@@ -77,7 +61,7 @@ img_12.show()
 
     [<AxesSubplot:>, <AxesSubplot:>, <AxesSubplot:>, <AxesSubplot:>]
 
-![](index_files/figure-gfm/cell-5-output-2.png)
+![](index_files/figure-gfm/cell-4-output-2.png)
 
 ## Acknowledgements
 
