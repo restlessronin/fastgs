@@ -11,14 +11,22 @@ from fastai.vision.all import *
 from .core import *
 
 # %% ../../nbs/08a_vision.data.ipynb 6
-def _show_one_sample(img: TensorImageMS, msk: TensorMask, row, mskovl, **kwargs):
-    if mskovl:
-        return [msk.show(ctx=c, **kwargs) for c in img.show(ctxs=row, **kwargs)]
-    else:
-        nimgs = img.num_images()
-        return img.show(ctxs=row[:nimgs]) + [msk.show(row[nimgs])]
+def _get_sample_ctxs(nimgs: int, nsamples: int, mskovl: bool, figsize=None):
+    nrows = nsamples
+    ncols = nimgs if mskovl else nimgs + 1
+
+    ctxs = get_grid(nrows * ncols, nrows, ncols, figsize=figsize)
+    return [ctxs[pos : pos + ncols] for pos in range(0, len(ctxs), ncols)]
 
 # %% ../../nbs/08a_vision.data.ipynb 7
+def _show_one_sample(img: TensorImageMS, msk: TensorMask, row, mskovl: bool, **kwargs):
+    if mskovl:
+        return [msk.show(ctx=c,**kwargs) for c in img.show(ctxs=row,**kwargs)]
+    else:
+        nimgs: int = img.num_images()
+        return img.show(ctxs=row[:nimgs],**kwargs) + [msk.show(ctx=row[nimgs],**kwargs)]
+
+# %% ../../nbs/08a_vision.data.ipynb 14
 @typedispatch
 def show_batch(
     x: TensorImageMS,  # Input(s) in the batch
@@ -26,21 +34,15 @@ def show_batch(
     samples: list,  # List of (`x`, `y`) pairs of length `max_n`
     ctxs=None,  # List of `ctx` objects to show data. Could be a matplotlib axis, DataFrame, etc.
     max_n: int=9,  # Maximum number of `samples` to show
-    nrows:int=None,
-    ncols:int=None,
+    nrows: int=None,
+    ncols: int=None,
     figsize=None,
-    mskovl:bool=True, # mask is overlaid on the image
+    mskovl: bool=True, # mask is overlaid on the image
     **kwargs
 ):
     assert len(samples[0]) == 2 and not hasattr(samples[0], "show")
     assert nrows is None and ncols is None and ctxs is None
 
-    nimgs = x.num_images()
-    nrows = min(len(samples),max_n)
-    ncols = nimgs if mskovl else nimgs + 1
-
-    ctxs = get_grid(nrows * ncols, nrows, ncols, figsize=figsize)
-    rwcx = [ctxs[pos : pos + ncols] for pos in range(0, len(ctxs), ncols)]
+    rwcx = _get_sample_ctxs(x.num_images(), min(len(samples),max_n), mskovl, figsize)
     imgs,msks = samples.itemgot(0),samples.itemgot(1)
-
-    return [_show_one_sample(img, msk, row, mskovl) for img, msk, row, _ in zip(imgs, msks, rwcx, range(nrows))]
+    return [_show_one_sample(img, msk, row, mskovl,**kwargs) for img, msk, row in zip(imgs, msks, rwcx)]

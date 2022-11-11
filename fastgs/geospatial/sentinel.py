@@ -78,13 +78,15 @@ def __init__(
     chn_grp_ids: list[list[str]],
     files_getter: Callable[[list[str], Any], list[str]],
     chan_io_fn: Callable[[list[str]], Tensor],
+    mask_io_fn: Callable[[str], TensorMask] = None,
 ):
     self.bands = BandInputs.from_ids(band_ids)
     self.chn_grp_ids = chn_grp_ids
     self.files_getter = files_getter
     self.chan_io_fn = chan_io_fn
+    self.mask_io_fn = mask_io_fn
 
-# %% ../../nbs/62_geospatial.sentinel.ipynb 39
+# %% ../../nbs/62_geospatial.sentinel.ipynb 38
 @patch
 def _load_tensor(self: Sentinel2, img_id, cls: TensorImage) -> TensorImage:
     files = self.files_getter(self.bands.ids, img_id)
@@ -96,3 +98,13 @@ def _load_tensor(self: Sentinel2, img_id, cls: TensorImage) -> TensorImage:
 @patch
 def load_tensor(self: Sentinel2, img_id) -> TensorImageMS:
     return self._load_tensor(img_id, TensorImageMS)                
+
+# %% ../../nbs/62_geospatial.sentinel.ipynb 43
+@patch
+def _load_mask(self: Sentinel2, msk_id: str, img_id) -> TensorMask:
+    file = self.files_getter([msk_id], img_id)[0]
+    return self.mask_io_fn(file)
+
+@patch
+def load_mask(self: Sentinel2, img_id) -> TensorMask:
+    return self._load_mask("LC", img_id)

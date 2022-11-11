@@ -57,13 +57,13 @@ channels into a
 [`TensorImageMS`](https://restlessronin.github.io/fastgs/vision.core.html#tensorimagems).
 
 ``` python
-from fastgs.vision.io import * # defines read_multichan_files_as_tensor
+from fastgs.vision.testio import * # defines read_multichan_files_as_tensor
 
 snt_12 = Sentinel2(
     ["B02","B03","B04","B05","B06","B07","B08","B8A","B11","B12","AOT"],
     [Sentinel2.natural_color, ["B07","B06","B05"],["B12","B11","B8A"],["B08"]],
     get_channel_filenames,
-    read_multichan_files_as_tensor
+    read_multichan_files
 )
 ```
 

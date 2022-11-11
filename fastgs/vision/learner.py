@@ -11,34 +11,34 @@ from fastai.vision.all import *
 from .core import *
 
 # %% ../../nbs/21a_vision.learner.ipynb 6
-def _show_one_result(img: TensorImageMS, msk: TensorMask, out, row, mskovl, **kwargs):
-    if mskovl:
-        rowl = len(row) / 2
-        return [msk.show(ctx=c, **kwargs) for c in img.show(row[:rowl])]
-        + [out.show(ctx=c, **kwargs) for c in img.show(row[rowl:])]
-    else:
-        nimgs = img.num_images()
-        return img.show(ctxs=row[:nimgs]) + [msk.show(row[nimgs])] + [out.show(row[nimgs+1])]
+def _get_sample_ctxs(nimgs: int, nsamples: int, mskovl: bool, figsize=None):
+    nrows = 2 * nsamples if mskovl else nsamples
+    ncols = nimgs if mskovl else nimgs + 2
+
+    ctxs = get_grid(nrows * ncols, nrows, ncols, figsize=figsize, title='Ground Truth/Prediction')
+    chksize = 2 * nimgs if mskovl else nimgs + 2
+    return [ctxs[pos : pos + chksize] for pos in range(0, len(ctxs), chksize)]
 
 # %% ../../nbs/21a_vision.learner.ipynb 7
+def _show_one_result(img: TensorImageMS, msk: TensorMask, out: TensorMask, row, mskovl: bool, **kwargs):
+    if mskovl:
+        rowl: int = len(row) // 2
+        return [msk.show(ctx=c, **kwargs) for c in img.show(ctxs=row[:rowl],**kwargs)] + [out.show(ctx=c,**kwargs) for c in img.show(ctxs=row[rowl:],**kwargs)]
+    else:
+        nimgs: int = img.num_images()
+        return img.show(ctxs=row[:nimgs],**kwargs) + [msk.show(ctx=row[nimgs],**kwargs)] + [out.show(ctx=row[nimgs+1],**kwargs)]
+
+# %% ../../nbs/21a_vision.learner.ipynb 11
 @typedispatch
 def show_results(x:TensorImageMS, y:TensorMask, samples, outs, ctxs=None, max_n=6,
                  nrows:int=None, ncols:int=None, figsize=None, mskovl:bool=True, **kwargs):
     assert nrows is None and ncols is None and ctxs is None
-    
-    nimgs = x.num_images()
-    n = min(len(samples),max_n)
-    nrows = 2 * n if mskovl else n
-    ncols = nimgs if mskovl else nimgs + 2
 
-    ctxs = get_grid(nrows * ncols, nrows, ncols, figsize=figsize, title='Ground Truth/Prediction')
-    chksize = 2 * n if mskovl else nimgs + 2
-    rwcx = [ctxs[pos : pos + chksize] for pos in range(0, len(ctxs), ncols)]
-
+    rwcx = _get_sample_ctxs(x.num_images(), min(len(samples),max_n), mskovl, figsize)
     imgs,msks,otps = samples.itemgot(0),samples.itemgot(1),outs.itemgot(0)
-    return [_show_one_result(img, msk, otp, row, mskovl, **kwargs) for img,msk,otp,row in zip(imgs, msks, outs, rwcx)]
+    return [_show_one_result(img, msk, otp[0], row, mskovl, **kwargs) for img,msk,otp,row in zip(imgs, msks, outs, rwcx)]
 
-# %% ../../nbs/21a_vision.learner.ipynb 8
+# %% ../../nbs/21a_vision.learner.ipynb 12
 @typedispatch
 def plot_top_losses(x:TensorImageMS, y:TensorMask, samples, outs, raws, losses, nrows=None, ncols=None, figsize=None, **kwargs):
     axes = get_grid(len(samples)*3, nrows=len(samples), ncols=3, figsize=figsize, flatten=False, title="Input | Target | Prediction")
