@@ -18,8 +18,13 @@ imaging.
 
 You can find demo usage of the library at
 
-1.  On the kaggle [38-cloud/95-cloud
+1.  On the kaggle [38-cloud/95-cloud landsat
     dataset](https://www.kaggle.com/code/restlessronin/fastgs-cloud-segmentation/)
+2.  With a private [Sentinel 2
+    dataset](https://www.kaggle.com/code/restlessronin/ld-2-trn-base)
+
+These are boths works in progress and purposely designed to display the
+features of the library.
 
 ## Install
 
