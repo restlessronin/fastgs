@@ -17,8 +17,8 @@ specifically in the context of Sentinel 2 geospatial imaging.
 
 You can find demo usage of the library at
 
-1.  On the kaggle \[38-cloud/95-cloud dataset\]
-    (https://www.kaggle.com/code/restlessronin/fastgs-cloud-segmentation/)
+1.  On the kaggle [38-cloud/95-cloud
+    dataset](https://www.kaggle.com/code/restlessronin/fastgs-cloud-segmentation/)
 
 ## Install
 
