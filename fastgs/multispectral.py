@@ -196,6 +196,5 @@ def create_unet_learner(self: MSPipeline,dl,model,pretrained=True,loss_func=Cros
         w = layer_1.weight
         w_mean = torch.mean(w[:,:3,:,:],1,True)
         w[:,3:,:,:] = w_mean
-        new_w = w * (3.0 / w.shape[1])
-        layer_1.weight = new_w
+        w = w * (3.0 / w.shape[1])
     return learner
