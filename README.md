@@ -8,10 +8,11 @@ Welcome to fastgs
 **This library is currently in *alpha*, neither the functionality nor
 the API is stable**
 
-This library provides geospatial MSData image support for fastai. FastAI
-already has extensive support for RGB images in the pipeline. I try to
-achieve feature parity for multi-spectral images with this library,
-specifically in the context of Sentinel 2 geospatial imaging.
+This library provides geospatial multi-spectral image support for
+fastai. FastAI already has extensive support for RGB images in the
+pipeline. I try to achieve feature parity for multi-spectral images with
+this library, specifically in the context of Sentinel 2 geospatial
+imaging.
 
 ## Sample Notebooks
 
