@@ -32,7 +32,7 @@ subclass of `fastai` `TensorImage` which itself is a subclass of the
 `pytorch` `Tensor`).
 
 ``` python
-from fastgs.geospatial.sentinel import *
+from fastgs.multispectral import *
 ```
 
 The following code creates a class that can load 11 Sentinel 2 channels
