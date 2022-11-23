@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 # %% auto 0
-__all__ = ['BandInputs', 'Sentinel2']
+__all__ = ['BandInputs', 'MSDescriptor', 'createSentinel2Descriptor', 'MultiSpectral']
 
 # %% ../../nbs/62_geospatial.sentinel.ipynb 3
 from typing import Callable
@@ -40,71 +40,85 @@ def get_bands_list(self: BandInputs, ids_list: list[list[str]]) -> list[tuple[in
     return [self._get_bands(ids) for ids in ids_list]
 
 # %% ../../nbs/62_geospatial.sentinel.ipynb 18
-class Sentinel2:
-    band_ids: list[str] = ["B01","B02","B03","B04","B05","B06","B07","B08","B8A","B09","B10","B11","B12","AOT",]
-    res_m: list[int] = [60,10,10,10,20,20,20,10,20,60,60,20,20,20]
-    brgtX: list[float] = [2.5,4.75,4.25,3.75,3,2,1.7,1.7,2.5,2.5,1.6,1.6,2.2,30,]
-
-    # https://gisgeography.com/sentinel-2-bands-combinations/
-    natural_color = ["B04","B03","B02"]
-    color_infrared = ["B08","B04","B03"]
-    short_wave_infrared = ["B12","B8a","B04"]
-    agriculture = ["B11","B08","B02"]
-    geology = ["B12","B11","B02"]
-    bathymetric = ["B04","B03","B01"]
+@dataclass
+class MSDescriptor:
+    band_ids: list[str]
+    res_m: list[int]
+    brgtX: list[float]
+    rgb_combo: dict[str,list[str]]
 
 # %% ../../nbs/62_geospatial.sentinel.ipynb 20
-@patch(cls_method=True)
-def get_res_ids(cls: Sentinel2, res: int) -> list[str]:
-    indices = [i for i,r in enumerate(cls.res_m) if r == res]
-    return [cls.band_ids[i] for i in indices]
+def createSentinel2Descriptor() -> MSDescriptor:
+    return MSDescriptor(
+        ["B01","B02","B03","B04","B05","B06","B07","B08","B8A","B09","B10","B11","B12","AOT"],
+        [60,10,10,10,20,20,20,10,20,60,60,20,20,20],
+        [2.5,4.75,4.25,3.75,3,2,1.7,1.7,2.5,2.5,1.6,1.6,2.2,30],
+        {# https://gisgeography.com/sentinel-2-bands-combinations/
+            "natural_color": ["B04","B03","B02"],
+            "color_infrared": ["B08","B04","B03"],
+            "short_wave_infrared": ["B12","B8a","B04"],
+            "agriculture": ["B11","B08","B02"],
+            "geology": ["B12","B11","B02"],
+            "bathymetric": ["B04","B03","B01"]
+        }
+    )
 
 # %% ../../nbs/62_geospatial.sentinel.ipynb 23
-@patch(cls_method=True)
-def get_brgtX(cls: Sentinel2, ids: list[str]) -> list[float]:
-    indices = [cls.band_ids.index(id) for id in ids]
-    return [cls.brgtX[i] for i in indices]
+@patch
+def get_res_ids(self: MSDescriptor, res: int) -> list[str]:
+    indices = [i for i,r in enumerate(self.res_m) if r == res]
+    return [self.band_ids[i] for i in indices]
 
 # %% ../../nbs/62_geospatial.sentinel.ipynb 26
-@patch(cls_method=True)
-def get_brgtX_list(cls: Sentinel2, ids_list: list[list[str]]) -> list[list[float]]:
-    return [cls.get_brgtX(ids) for ids in ids_list]
+@patch
+def get_brgtX(self: MSDescriptor, ids: list[str]) -> list[float]:
+    indices = [self.band_ids.index(id) for id in ids]
+    return [self.brgtX[i] for i in indices]
 
 # %% ../../nbs/62_geospatial.sentinel.ipynb 29
 @patch
+def get_brgtX_list(self: MSDescriptor, ids_list: list[list[str]]) -> list[list[float]]:
+    return [self.get_brgtX(ids) for ids in ids_list]
+
+# %% ../../nbs/62_geospatial.sentinel.ipynb 32
+class MultiSpectral:
+    pass
+
+# %% ../../nbs/62_geospatial.sentinel.ipynb 33
+@patch
 def __init__(
-    self: Sentinel2,
+    self: MultiSpectral,
+    ms_descriptor: MSDescriptor,
     band_ids: list[str],
+    mask_id: str,
     chn_grp_ids: list[list[str]],
     files_getter: Callable[[list[str], Any], list[str]],
     chan_io_fn: Callable[[list[str]], Tensor],
     mask_io_fn: Callable[[str], TensorMask] = None,
 ):
+    self.ms_descriptor = ms_descriptor
     self.bands = BandInputs.from_ids(band_ids)
+    self.mask_id = mask_id
     self.chn_grp_ids = chn_grp_ids
     self.files_getter = files_getter
     self.chan_io_fn = chan_io_fn
     self.mask_io_fn = mask_io_fn
 
-# %% ../../nbs/62_geospatial.sentinel.ipynb 38
+# %% ../../nbs/62_geospatial.sentinel.ipynb 42
 @patch
-def _load_tensor(self: Sentinel2, img_id, cls: TensorImage) -> TensorImage:
+def _load_image(self: MultiSpectral, img_id, cls: TensorImage) -> TensorImage:
     files = self.files_getter(self.bands.ids, img_id)
     ids_list = self.chn_grp_ids
     bands = self.bands.get_bands_list(ids_list)
-    brgtX = self.__class__.get_brgtX_list(ids_list)
+    brgtX = self.ms_descriptor.get_brgtX_list(ids_list)
     return cls(self.chan_io_fn(files), bands=bands, brgtX=brgtX)
 
 @patch
-def load_tensor(self: Sentinel2, img_id) -> TensorImageMS:
-    return self._load_tensor(img_id, TensorImageMS)                
+def load_image(self: MultiSpectral, img_id) -> TensorImageMS:
+    return self._load_image(img_id, TensorImageMS)                
 
-# %% ../../nbs/62_geospatial.sentinel.ipynb 43
+# %% ../../nbs/62_geospatial.sentinel.ipynb 47
 @patch
-def _load_mask(self: Sentinel2, msk_id: str, img_id) -> TensorMask:
-    file = self.files_getter([msk_id], img_id)[0]
+def load_mask(self: MultiSpectral, img_id) -> TensorMask:
+    file = self.files_getter([self.mask_id], img_id)[0]
     return self.mask_io_fn(file)
-
-@patch
-def load_mask(self: Sentinel2, img_id) -> TensorMask:
-    return self._load_mask("LC", img_id)

@@ -42,9 +42,13 @@ into a
 ``` python
 from fastgs.vision.testio import * # defines read_multichan_files_as_tensor
 
-snt_12 = Sentinel2(
+sentinel2 = createSentinel2Descriptor()
+
+snt_12 = MultiSpectral(
+    sentinel2,
     ["B02","B03","B04","B05","B06","B07","B08","B8A","B11","B12","AOT"],
-    [Sentinel2.natural_color, ["B07","B06","B05"],["B12","B11","B8A"],["B08"]],
+    "LC",
+    [sentinel2.rgb_combo["natural_color"], ["B07","B06","B05"],["B12","B11","B8A"],["B08"]],
     get_channel_filenames,
     read_multichan_files,
     read_mask_file
@@ -55,7 +59,7 @@ The second parameter is a list of 4 channel sets that are minimally
 required to visualize all the individual channels.
 
 ``` python
-img_12 = snt_12.load_tensor(66)
+img_12 = snt_12.load_image(66)
 img_12.show()
 ```
 
