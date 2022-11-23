@@ -8,10 +8,10 @@ Welcome to fastgs
 **This library is currently in *alpha*, neither the functionality nor
 the API is stable**
 
-This library provides geospatial multispectral image support for fastai.
-FastAI already has extensive support for RGB images in the pipeline. I
-try to achieve feature parity for multi-spectral images with this
-library, specifically in the context of Sentinel 2 geospatial imaging.
+This library provides geospatial MSData image support for fastai. FastAI
+already has extensive support for RGB images in the pipeline. I try to
+achieve feature parity for multi-spectral images with this library,
+specifically in the context of Sentinel 2 geospatial imaging.
 
 ## Install
 
@@ -44,14 +44,12 @@ from fastgs.vision.testio import * # defines read_multichan_files_as_tensor
 
 sentinel2 = createSentinel2Descriptor()
 
-snt_12 = MultiSpectral(
+snt_12 = MSData(
     sentinel2,
     ["B02","B03","B04","B05","B06","B07","B08","B8A","B11","B12","AOT"],
-    "LC",
     [sentinel2.rgb_combo["natural_color"], ["B07","B06","B05"],["B12","B11","B8A"],["B08"]],
     get_channel_filenames,
-    read_multichan_files,
-    read_mask_file
+    read_multichan_files
 )
 ```
 
@@ -72,5 +70,5 @@ img_12.show()
 This library is inspired by the following notebooks (and related works
 by the authors)
 
-- https://dpird-dma.github.io/blog/Multispectral-image-classification-Transfer-Learning/
+- https://dpird-dma.github.io/blog/MSData-image-classification-Transfer-Learning/
 - https://github.com/cordmaur/Fastai2-Medium/blob/master/01_Create_Datablock.ipynb
