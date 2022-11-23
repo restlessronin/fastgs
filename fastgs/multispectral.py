@@ -184,10 +184,18 @@ def create_data_block(self: MSPipeline, splitter=RandomSplitter(valid_pct=0.2, s
         splitter=splitter
     )
 
-# %% ../nbs/62_multispectral.ipynb 60
+# %% ../nbs/62_multispectral.ipynb 61
 @patch
-def create_unet_learner(self: MSPipeline,dl,model,pretrained=True,loss_func=CrossEntropyLossFlat(axis=1),metrics=Dice(axis=1)):
-    return unet_learner(
+def create_unet_learner(self: MSPipeline,dl,model,pretrained=True,loss_func=CrossEntropyLossFlat(axis=1),metrics=Dice(axis=1)) -> Learner:
+    learner = unet_learner(
         dl,model,normalize=False,n_in=len(self.ms_data.bands.ids),n_out=len(self.mask_data.mask_codes),
         pretrained=pretrained, loss_func=loss_func,metrics=metrics
     )
+    if pretrained:
+        layer_1 = learner.model[0][0]
+        w = layer_1.weight
+        w_mean = torch.mean(w[:,:3,:,:],1,True)
+        w[:,3:,:,:] = w_mean
+        new_w = w * (3.0 / w.shape[1])
+        layer_1.weight = new_w
+    return learner
