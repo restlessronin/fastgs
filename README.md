@@ -13,6 +13,13 @@ already has extensive support for RGB images in the pipeline. I try to
 achieve feature parity for multi-spectral images with this library,
 specifically in the context of Sentinel 2 geospatial imaging.
 
+## Sample Notebooks
+
+You can find demo usage of the library at
+
+1.  On the kaggle \[38-cloud/95-cloud dataset\]
+    (https://www.kaggle.com/code/restlessronin/fastgs-cloud-segmentation/)
+
 ## Install
 
 ``` sh
