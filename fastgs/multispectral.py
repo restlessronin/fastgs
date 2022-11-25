@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 # %% auto 0
-__all__ = ['BandInputs', 'MSDescriptor', 'createSentinel2Descriptor', 'MSData', 'MaskData', 'MSPipeline']
+__all__ = ['BandInputs', 'MSDescriptor', 'createSentinel2Descriptor', 'MSData', 'MaskData', 'MSAugment', 'FastGS']
 
 # %% ../nbs/62_multispectral.ipynb 3
 from typing import Callable
@@ -12,6 +12,7 @@ from dataclasses import dataclass
 from fastai.vision.all import *
 
 from .vision.core import *
+from .vision.augment import *
 
 # %% ../nbs/62_multispectral.ipynb 5
 @dataclass
@@ -131,10 +132,7 @@ def __init__(
     mask_io_fn: Callable[[list[str]], TensorMask],
     mask_codes: list[str]
 ):
-    self.mask_id = mask_id
-    self.files_getter = files_getter
-    self.mask_io_fn = mask_io_fn
-    self.mask_codes = mask_codes
+    store_attr()
 
 # %% ../nbs/62_multispectral.ipynb 50
 @patch
@@ -148,6 +146,14 @@ def num_channels(self: MaskData) -> int:
     return len(self.mask_codes)
 
 # %% ../nbs/62_multispectral.ipynb 54
+class MSAugment:
+    pass
+
+# %% ../nbs/62_multispectral.ipynb 55
+@patch
+def __init__(self: MSAugment,train_aug=None,valid_aug=None): store_attr()
+
+# %% ../nbs/62_multispectral.ipynb 57
 @patch
 def create_xform_block(self: MSData) -> DataBlock:
     return TransformBlock(
@@ -156,7 +162,7 @@ def create_xform_block(self: MSData) -> DataBlock:
         ]
     )
 
-# %% ../nbs/62_multispectral.ipynb 55
+# %% ../nbs/62_multispectral.ipynb 58
 @patch
 def create_xform_block(self: MaskData) -> DataBlock:
     return TransformBlock(
@@ -166,27 +172,39 @@ def create_xform_block(self: MaskData) -> DataBlock:
         ]
     )
 
-# %% ../nbs/62_multispectral.ipynb 57
-class MSPipeline:
-    pass
-
-# %% ../nbs/62_multispectral.ipynb 58
-@patch
-def __init__(self: MSPipeline, ms_data: MSData, mask_data: MaskData):
-    self.ms_data = ms_data
-    self.mask_data = mask_data
-
 # %% ../nbs/62_multispectral.ipynb 59
 @patch
-def create_data_block(self: MSPipeline, splitter=RandomSplitter(valid_pct=0.2, seed=107)) -> DataBlock:
-    return DataBlock(
-        blocks=(self.ms_data.create_xform_block(), self.mask_data.create_xform_block()),
-        splitter=splitter
-    )
+def create_item_xforms(self: MSAugment) -> list(ItemTransform):
+    if self.train_aug is None and self.valid_aug is None:
+        return []
+    elif self.valid_aug is None:
+        return [TrainMSSAT(self.train_aug)]
+    elif self.train_aug is None:
+        return [ValidMSSAT(self.train_aug)]
+    else:
+        return [TrainMSSAT(self.train_aug),ValidMSSAT(self.valid_aug)]
 
 # %% ../nbs/62_multispectral.ipynb 61
+class FastGS:
+    pass
+
+# %% ../nbs/62_multispectral.ipynb 62
 @patch
-def create_unet_learner(self: MSPipeline,dl,model,pretrained=True,loss_func=CrossEntropyLossFlat(axis=1),metrics=Dice(axis=1)) -> Learner:
+def __init__(self: FastGS, ms_data: MSData, mask_data: MaskData, ms_aug: MSAugment=MSAugment()):
+    store_attr()
+
+# %% ../nbs/62_multispectral.ipynb 63
+@patch
+def create_data_block(self: FastGS, splitter=RandomSplitter(valid_pct=0.2, seed=107)) -> DataBlock:
+    return DataBlock(
+        blocks=(self.ms_data.create_xform_block(), self.mask_data.create_xform_block()),
+        splitter=splitter,
+        item_tfms=self.ms_aug.create_item_xforms()
+    )
+
+# %% ../nbs/62_multispectral.ipynb 65
+@patch
+def create_unet_learner(self: FastGS,dl,model,pretrained=True,loss_func=CrossEntropyLossFlat(axis=1),metrics=Dice(axis=1)) -> Learner:
     learner = unet_learner(
         dl,model,normalize=False,n_in=len(self.ms_data.bands.ids),n_out=len(self.mask_data.mask_codes),
         pretrained=pretrained, loss_func=loss_func,metrics=metrics
