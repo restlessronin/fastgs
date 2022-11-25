@@ -28,7 +28,7 @@ def _show_one_result(img: TensorImageMS, msk: TensorMask, out: TensorMask, row, 
         nimgs: int = img.num_images()
         return img.show(ctxs=row[:nimgs],**kwargs) + [msk.show(ctx=row[nimgs],**kwargs)] + [out.show(ctx=row[nimgs+1],**kwargs)]
 
-# %% ../../nbs/21a_vision.learner.ipynb 12
+# %% ../../nbs/21a_vision.learner.ipynb 14
 @typedispatch
 def show_results(x:TensorImageMS, y:TensorMask, samples, outs, ctxs=None, max_n=6,
                  nrows:int=None, ncols:int=None, figsize=None, mskovl:bool=True, **kwargs):
@@ -38,7 +38,7 @@ def show_results(x:TensorImageMS, y:TensorMask, samples, outs, ctxs=None, max_n=
     imgs,msks,otps = samples.itemgot(0),samples.itemgot(1),outs.itemgot(0)
     return [_show_one_result(img, msk, otp[0], row, mskovl, **kwargs) for img,msk,otp,row in zip(imgs, msks, outs, rwcx)]
 
-# %% ../../nbs/21a_vision.learner.ipynb 13
+# %% ../../nbs/21a_vision.learner.ipynb 15
 @typedispatch
 def plot_top_losses(x:TensorImageMS, y:TensorMask, samples, outs, raws, losses, nrows=None, ncols=None, figsize=None, mskovl: bool=True, **kwargs):
     assert nrows is None and ncols is None

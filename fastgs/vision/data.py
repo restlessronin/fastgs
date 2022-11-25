@@ -26,7 +26,7 @@ def _show_one_sample(img: TensorImageMS, msk: TensorMask, row, mskovl: bool, **k
         nimgs: int = img.num_images()
         return img.show(ctxs=row[:nimgs],**kwargs) + [msk.show(ctx=row[nimgs],**kwargs)]
 
-# %% ../../nbs/08a_vision.data.ipynb 15
+# %% ../../nbs/08a_vision.data.ipynb 17
 @typedispatch
 def show_batch(
     x: TensorImageMS,  # Input(s) in the batch
