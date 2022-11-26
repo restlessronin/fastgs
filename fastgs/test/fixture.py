@@ -7,14 +7,17 @@ from __future__ import annotations
 __all__ = ['get_elvn_bands_test_tuple']
 
 # %% ../../nbs/001_test.fixture.ipynb 3
+from fastai.vision.all import *
 from .io import *
+from ..vision.core import *
 from ..multispectral import *
 
 # %% ../../nbs/001_test.fixture.ipynb 5
 def get_elvn_bands_test_tuple() -> tuple(TensorImageMS, TensorMask):
+    "Create sample test tuple for eleven band Sentinel 2 data"
     sentinel2 = createSentinel2Descriptor()
 
-    elvn_bands = MSData(
+    elvn_bands = MSData.from_all(
         sentinel2,
         ["B02","B03","B04","B05","B06","B07","B08","B8A","B11","B12","AOT"],
         [sentinel2.rgb_combo["natural_color"], ["B07","B06","B05"],["B12","B11","B8A"],["B08"]],
