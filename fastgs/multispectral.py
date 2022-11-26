@@ -60,12 +60,12 @@ def from_all(
     return cls(bands,brgtX,res_m,rgb_combo)
 
 @patch(cls_method=True)
-def from_band_brgt(cls: MSDescriptor, x, bands: tuple(int), brgtX: list[int]):
-    return cls.from_all(x,bands,brgtX,[None]*len(bands))    
+def from_band_brgt(cls: MSDescriptor, bands: tuple(int), brgtX: list[int]):
+    return cls.from_all(bands,brgtX,[None]*len(bands))    
 
 @patch(cls_method=True)
-def from_bands(cls: MSDescriptor, x, bands: tuple(int)):
-    return cls.from_band_brgt(x,bands,[1.0]*len(bands),[None]*len(bands))
+def from_bands(cls: MSDescriptor, bands: tuple(int)):
+    return cls.from_band_brgt(bands,[1.0]*len(bands),[None]*len(bands))
 
 # %% ../nbs/62_multispectral.ipynb 23
 def createSentinel2Descriptor() -> MSDescriptor:
