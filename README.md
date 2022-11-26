@@ -19,9 +19,9 @@ imaging.
 You can find demo usage of the library at
 
 1.  On the kaggle [38-cloud/95-cloud landsat
-    dataset](https://www.kaggle.com/code/restlessronin/fastgs-cloud-segmentation/)
+    dataset](https://www.kaggle.com/code/restlessronin/cloud95-fastai-with-fastgs-multispectral-support)
 2.  With a private [Sentinel 2
-    dataset](https://www.kaggle.com/code/restlessronin/ld-2-trn-base)
+    dataset](https://www.kaggle.com/code/restlessronin/lila-sentinel-2-segmentation-with-fastai)
 
 These are boths works in progress and purposely designed to display the
 features of the library.
@@ -78,12 +78,16 @@ img_12.show()
 
 ![](index_files/figure-gfm/cell-4-output-2.png)
 
+This lower level functionality is made available by higher level wrapper
+APIs for creating data loaders, adding augmentations, displaying
+batches, results and top losses.
+
 ## Acknowledgements
 
 This library is inspired by the following notebooks (and related works
 by the authors)
 
-- [Mauricio Cordeiro’s multi-spectral segmentation fastai
-  pipeline](https://github.com/cordmaur/Fastai2-Medium/blob/master/01_Create_Datablock.ipynb)
-- [Nick Wright’s multi-spectral classification
+- Mauricio Cordeiro’s [multi-spectral segmentation fastai
+  pipeline](https://www.kaggle.com/code/cordmaur/remotesensing-fastai2-multiband-augmentations/notebook)
+- Nick Wright’s [multi-spectral classification
   notebook](https://dpird-dma.github.io/blog/Multispectral-image-classification-Transfer-Learning//)
