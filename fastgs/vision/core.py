@@ -22,21 +22,25 @@ class TensorImageMS(TensorImage):
 
 # %% ../../nbs/07a_vision.core.ipynb 7
 @patch(cls_method=True)
-def from_tensor(cls: TensorImageMS, x, bands=[], brgtX=[]):
+def from_tensor(cls: TensorImageMS, x, bands: tuple(int), brgtX: list(float)):
     return cls(x, bands=bands, brgtX=brgtX)
 
-# %% ../../nbs/07a_vision.core.ipynb 10
+@patch(cls_method=True)
+def from_tensor_bands(cls: TensorImageMS, x, bands: tuple(int)):
+    return cls.from_tensor(x, bands=bands, brgtX=[1]*len(bands))
+
+# %% ../../nbs/07a_vision.core.ipynb 11
 @patch
 def num_images(self: TensorImageMS) -> int:
     return len(self.bands)
 
-# %% ../../nbs/07a_vision.core.ipynb 13
+# %% ../../nbs/07a_vision.core.ipynb 14
 @patch
 def _select_bands(self: TensorImageMS, bands: tuple[int]) -> TensorImageMS:
     assert len(bands) <= 3
     return torch.index_select(self, 0, torch.IntTensor(bands))
 
-# %% ../../nbs/07a_vision.core.ipynb 16
+# %% ../../nbs/07a_vision.core.ipynb 17
 @patch
 def _brighten(self: TensorImageMS, brgtX: list[float]) -> TensorImageMS:
     assert self.shape[0] == len(brgtX)
@@ -44,27 +48,27 @@ def _brighten(self: TensorImageMS, brgtX: list[float]) -> TensorImageMS:
     multX = reduce(lambda mX, _: mX.unsqueeze(-1), brdcsts, Tensor(brgtX))
     return torch.clamp(self * multX, 0, 1)
 
-# %% ../../nbs/07a_vision.core.ipynb 22
+# %% ../../nbs/07a_vision.core.ipynb 23
 @patch
 def _show_tiles(self: TensorImageMS, ctxs: list, **kwargs) -> list:
     assert ctxs is not None
     ims: TensorImageMS = [self._select_bands(b)._brighten(m) for b, m in zip(self.bands, self.brgtX)]
     return [show_image(im, ax=ax) for im, ax in zip(ims, ctxs)]
 
-# %% ../../nbs/07a_vision.core.ipynb 24
+# %% ../../nbs/07a_vision.core.ipynb 25
 @patch
 def _get_grid(self: TensorImageMS, nrows: int, **kwargs) -> list:
     ncols = self.num_images()
     ncells = nrows * ncols
     return get_grid(ncells, nrows, ncols, **kwargs)
 
-# %% ../../nbs/07a_vision.core.ipynb 26
+# %% ../../nbs/07a_vision.core.ipynb 27
 @patch
 def show(self: TensorImageMS, ctxs=None, **kwargs) -> list:
     ctxs = self._get_grid(1, **kwargs) if ctxs is None else ctxs
     return self._show_tiles(ctxs=ctxs, **kwargs)
 
-# %% ../../nbs/07a_vision.core.ipynb 33
+# %% ../../nbs/07a_vision.core.ipynb 34
 @patch
 def _show_animation(self: TensorImageMS):
     fig, ax = plt.subplots()
