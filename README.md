@@ -16,15 +16,17 @@ imaging.
 
 ## Sample Notebooks
 
-You can find demo usage of the library at
+You can find demo usage of the library in these notebooks
 
-1.  On the kaggle [38-cloud/95-cloud landsat
-    dataset](https://www.kaggle.com/code/restlessronin/cloud95-fastai-with-fastgs-multispectral-support)
-2.  With a private [Sentinel 2
+1.  working with the kaggle [38-cloud/95-cloud landsat
+    dataset](https://www.kaggle.com/code/restlessronin/cloud95-fastai-with-fastgs-multispectral-support).
+2.  working on a segmentation problem with a [Sentinel 2
     dataset](https://www.kaggle.com/code/restlessronin/lila-sentinel-2-segmentation-with-fastai)
 
-These are boths works in progress and purposely designed to display the
-features of the library.
+These are boths works in progress and optimized to display the features
+of the library, rather than the best possible results. Even so, the
+“cloud 95” notebook is providing results comparable to other hiqh
+quality notebooks on the same dataset.
 
 ## Install
 
