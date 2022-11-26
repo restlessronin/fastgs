@@ -53,11 +53,11 @@ into a
 [`TensorImageMS`](https://restlessronin.github.io/fastgs/vision.core.html#tensorimagems).
 
 ``` python
-from fastgs.vision.testio import * # defines read_multichan_files_as_tensor
+from fastgs.test.io import * # defines read_multichan_files_as_tensor
 
 sentinel2 = createSentinel2Descriptor()
 
-snt_12 = MSData(
+snt_12 = MSData.from_all(
     sentinel2,
     ["B02","B03","B04","B05","B06","B07","B08","B8A","B11","B12","AOT"],
     [sentinel2.rgb_combo["natural_color"], ["B07","B06","B05"],["B12","B11","B8A"],["B08"]],
@@ -83,5 +83,7 @@ img_12.show()
 This library is inspired by the following notebooks (and related works
 by the authors)
 
-- https://dpird-dma.github.io/blog/MSData-image-classification-Transfer-Learning/
-- https://github.com/cordmaur/Fastai2-Medium/blob/master/01_Create_Datablock.ipynb
+- [Mauricio Cordeiro’s multi-spectral segmentation fastai
+  pipeline](https://github.com/cordmaur/Fastai2-Medium/blob/master/01_Create_Datablock.ipynb)
+- [Nick Wright’s multi-spectral classification
+  notebook](https://dpird-dma.github.io/blog/Multispectral-image-classification-Transfer-Learning//)
