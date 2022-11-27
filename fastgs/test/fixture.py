@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 # %% auto 0
-__all__ = ['get_elvn_bands_test_tuple']
+__all__ = ['get_11b_test_tuple', 'get_11b_test_fgs', 'get_11b_test_learner', 'get_11b_test_dl']
 
 # %% ../../nbs/001_test.fixture.ipynb 3
 from fastai.vision.all import *
@@ -13,11 +13,9 @@ from ..vision.core import *
 from ..multispectral import *
 
 # %% ../../nbs/001_test.fixture.ipynb 5
-def get_elvn_bands_test_tuple() -> tuple(TensorImageMS, TensorMask):
-    "Create sample test tuple for eleven band Sentinel 2 data"
+def _get_11b_msdata():
     sentinel2 = createSentinel2Descriptor()
-
-    elvn_bands = MSData.from_all(
+    return MSData.from_all(
         sentinel2,
         ["B02","B03","B04","B05","B06","B07","B08","B8A","B11","B12","AOT"],
         [sentinel2.rgb_combo["natural_color"], ["B07","B06","B05"],["B12","B11","B8A"],["B08"]],
@@ -25,9 +23,34 @@ def get_elvn_bands_test_tuple() -> tuple(TensorImageMS, TensorMask):
         read_multichan_files
     )
 
-    masks = MaskData("LC",get_channel_filenames,read_mask_file,["non-buildings","buildings"])
+def _get_mask_data():
+    return MaskData("LC",get_channel_filenames,read_mask_file,["non-buildings","buildings"])
 
-    elvn_img = elvn_bands.load_image(66)
-    elvn_msk = masks.load_mask(66)
-    
-    return (elvn_img, elvn_msk)
+def _get_augs():
+    return MSAugment()
+
+# %% ../../nbs/001_test.fixture.ipynb 6
+def _get_11b_data_block():
+    return get_11b_test_fgs().create_data_block()
+
+def get_11b_test_tuple() -> tuple(TensorImageMS, TensorMask):
+    "Create sample test tuple for eleven band Sentinel 2 data"
+    return (
+        _get_11b_msdata().load_image(66),
+        _get_mask_data().load_mask(66)
+    )
+
+def get_11b_test_fgs(augs=_get_augs()):
+    "Create sample FastGS wrapper for eleven band Sentinel 2 data"
+    return FastGS(_get_11b_msdata(),_get_mask_data(),augs)
+
+def get_11b_test_learner():
+    "Create sample FastGS learner for eleven band Sentinel 2 data"
+    fgs = get_11b_test_fgs()
+    db = fgs.create_data_block()
+    dl = db.dataloaders(source=[66]*10,bs=8)
+    return fgs.create_unet_learner(dl, resnet18)
+
+def get_11b_test_dl() -> DataBlock:
+    "Create data loader with sample inputs repeated nlen times"
+    return _get_11b_data_block().dataloaders(source=[66]*10,bs=8)

@@ -28,7 +28,7 @@ def _show_one_result(img: TensorImageMS, msk: TensorMask, out: TensorMask, row, 
         nimgs: int = img.num_images()
         return img.show(ctxs=row[:nimgs],**kwargs) + [msk.show(ctx=row[nimgs],**kwargs)] + [out.show(ctx=row[nimgs+1],**kwargs)]
 
-# %% ../../nbs/21a_vision.learner.ipynb 14
+# %% ../../nbs/21a_vision.learner.ipynb 17
 @typedispatch
 def show_results(x:TensorImageMS, y:TensorMask, samples, outs, ctxs=None, max_n=6,
                  nrows:int=None, ncols:int=None, figsize=None, mskovl:bool=True, **kwargs):
@@ -37,14 +37,14 @@ def show_results(x:TensorImageMS, y:TensorMask, samples, outs, ctxs=None, max_n=
     imgs,msks,otps = samples.itemgot(0),samples.itemgot(1),outs.itemgot(0)
     return [_show_one_result(img, msk, otp[0], row, mskovl, **kwargs) for img,msk,otp,row in zip(imgs, msks, outs, rwcx)]
 
-# %% ../../nbs/21a_vision.learner.ipynb 15
+# %% ../../nbs/21a_vision.learner.ipynb 19
 @typedispatch
 def plot_top_losses(x:TensorImageMS, y:TensorMask, samples, outs, raws, losses, nrows=None, ncols=None, figsize=None, mskovl: bool=True, **kwargs):
     assert nrows is None and ncols is None
     rwcx = _get_sample_ctxs(x.num_images(), len(samples), mskovl, figsize)
     [_show_one_result(s[0], s[1], o[0], row, mskovl, **kwargs) for row,s,o,l in zip(rwcx, samples, outs, losses)]
 
-# %% ../../nbs/21a_vision.learner.ipynb 17
+# %% ../../nbs/21a_vision.learner.ipynb 22
 @patch
 def fastgs_reinit_weights(self:nn.Conv2d, reweight:str=None):
     w = self.weight.data
