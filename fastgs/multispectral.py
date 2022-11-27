@@ -13,6 +13,7 @@ from fastai.vision.all import *
 
 from .vision.core import *
 from .vision.augment import *
+from .vision.learner import *
 
 # %% ../nbs/62_multispectral.ipynb 5
 @dataclass
@@ -213,7 +214,7 @@ class FastGS:
 def __init__(self: FastGS, ms_data: MSData, mask_data: MaskData, ms_aug: MSAugment=MSAugment()):
     store_attr()
 
-# %% ../nbs/62_multispectral.ipynb 69
+# %% ../nbs/62_multispectral.ipynb 70
 @patch
 def create_data_block(self: FastGS, splitter=RandomSplitter(valid_pct=0.2, seed=107)) -> DataBlock:
     return DataBlock(
@@ -222,7 +223,7 @@ def create_data_block(self: FastGS, splitter=RandomSplitter(valid_pct=0.2, seed=
         item_tfms=self.ms_aug.create_item_xforms()
     )
 
-# %% ../nbs/62_multispectral.ipynb 71
+# %% ../nbs/62_multispectral.ipynb 72
 @patch
 def create_unet_learner(self: FastGS,dl,model,pretrained=True,loss_func=CrossEntropyLossFlat(axis=1),metrics=Dice(axis=1),reweight=None) -> Learner:
     learner = unet_learner(
