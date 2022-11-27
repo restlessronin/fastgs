@@ -13,6 +13,7 @@ from fastai.vision.all import *
 
 from .vision.core import *
 from .vision.augment import *
+from .vision.learner import *
 
 # %% ../nbs/62_multispectral.ipynb 5
 @dataclass
@@ -213,7 +214,7 @@ class FastGS:
 def __init__(self: FastGS, ms_data: MSData, mask_data: MaskData, ms_aug: MSAugment=MSAugment()):
     store_attr()
 
-# %% ../nbs/62_multispectral.ipynb 69
+# %% ../nbs/62_multispectral.ipynb 70
 @patch
 def create_data_block(self: FastGS, splitter=RandomSplitter(valid_pct=0.2, seed=107)) -> DataBlock:
     return DataBlock(
@@ -222,17 +223,13 @@ def create_data_block(self: FastGS, splitter=RandomSplitter(valid_pct=0.2, seed=
         item_tfms=self.ms_aug.create_item_xforms()
     )
 
-# %% ../nbs/62_multispectral.ipynb 71
+# %% ../nbs/62_multispectral.ipynb 72
 @patch
-def create_unet_learner(self: FastGS,dl,model,pretrained=True,loss_func=CrossEntropyLossFlat(axis=1),metrics=Dice(axis=1)) -> Learner:
+def create_unet_learner(self: FastGS,dl,model,pretrained=True,loss_func=CrossEntropyLossFlat(axis=1),metrics=Dice(axis=1),reweight=None) -> Learner:
     learner = unet_learner(
-        dl,model,normalize=False,n_in=len(self.ms_data.bands.ids),n_out=len(self.mask_data.mask_codes),
+        dl,model,n_in=len(self.ms_data.bands.ids),n_out=len(self.mask_data.mask_codes),
         pretrained=pretrained, loss_func=loss_func,metrics=metrics
     )
     if pretrained:
-        layer_1 = learner.model[0][0]
-        w = layer_1.weight
-        w_mean = torch.mean(w[:,:3,:,:],1,True)
-        w[:,3:,:,:] = w_mean
-        w = w * (3.0 / w.shape[1])
+        learner.model[0][0].fastgs_reinit_weights(reweight=reweight)
     return learner
