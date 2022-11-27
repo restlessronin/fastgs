@@ -22,12 +22,21 @@ class TensorImageMS(TensorImage):
 
 # %% ../../nbs/07a_vision.core.ipynb 7
 @patch(cls_method=True)
-def from_tensor(cls: TensorImageMS, x, bands: tuple(int), brgtX: list(float)):
+def from_tensor(
+    cls:TensorImageMS,
+    x, # tensor of channels
+    bands: list(tuple(int)), # list of index position tuples, each tuple is 3 ordered channel indices or a single channel index
+    brgtX: list(list(float)) # list of brightness multiplier lists, each list has a multiplier for each element of the corresponding channel tuple
+):
     return cls(x, bands=bands, brgtX=brgtX)
 
 @patch(cls_method=True)
-def from_tensor_bands(cls: TensorImageMS, x, bands: tuple(int)):
-    return cls.from_tensor(x, bands=bands, brgtX=[1]*len(bands))
+def from_tensor_bands(
+    cls: TensorImageMS,
+    x, # tensor of channels
+    bands: list(tuple(int)) # list of index position tuples, each tuple is 3 ordered channels or a single channel
+):
+    return cls.from_tensor(x, bands=bands, brgtX=[[1] * len(i) for i in bands])
 
 # %% ../../nbs/07a_vision.core.ipynb 11
 @patch
@@ -68,7 +77,7 @@ def show(self: TensorImageMS, ctxs=None, **kwargs) -> list:
     ctxs = self._get_grid(1, **kwargs) if ctxs is None else ctxs
     return self._show_tiles(ctxs=ctxs, **kwargs)
 
-# %% ../../nbs/07a_vision.core.ipynb 34
+# %% ../../nbs/07a_vision.core.ipynb 35
 @patch
 def _show_animation(self: TensorImageMS):
     fig, ax = plt.subplots()
