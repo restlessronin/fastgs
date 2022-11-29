@@ -50,9 +50,10 @@ handles extra channels by displaying them as additional images, either
 in sets of false-colour RGB images, or as ‘monochrome’ images (one per
 channel).
 
-There is also [experimental support](07a_vision.core.ipynb#) (not
-integrated into the high-level API yet) for mapping multi-spectral
-images to an animation of multiple images.
+There is also [experimental
+support](07a_vision.core.ipynb#animating-multiple-images) (not
+integrated into the API yet) for mapping multi-spectral images to an
+animation of multiple images. Feedback on it’s usefulness is welcome!
 
 The first use-case is Sentinel 2 images, which are naturally “dark”.
 There is a provision to provide “brightening” multipliers during
@@ -209,6 +210,21 @@ learner.fit_one_cycle(1)
 learner.show_results(mskovl=False)
 ```
 
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: left;">
@@ -230,6 +246,22 @@ learner.show_results(mskovl=False)
   </tbody>
 </table>
 
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+
 ![](index_files/figure-gfm/cell-13-output-5.png)
 
 Finally, we can look at the top losses
@@ -238,6 +270,39 @@ Finally, we can look at the top losses
 interp = SegmentationInterpretation.from_learner(learner)
 interp.plot_top_losses(k=1,mskovl=False)
 ```
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
 
 ![](index_files/figure-gfm/cell-14-output-5.png)
 
