@@ -15,7 +15,7 @@ from .vision.core import *
 from .vision.augment import *
 from .vision.learner import *
 
-# %% ../nbs/62_multispectral.ipynb 5
+# %% ../nbs/62_multispectral.ipynb 6
 @dataclass
 class BandInputs:
     ids: list[str]
@@ -25,31 +25,31 @@ class BandInputs:
     def from_ids(cls, ids: list[str]):
         return cls(ids, [i for i in range(len(ids))])
 
-# %% ../nbs/62_multispectral.ipynb 9
+# %% ../nbs/62_multispectral.ipynb 10
 @patch
 def _get_index(self: BandInputs, id: str) -> int:
     return self.idxs[self.ids.index(id)]
 
-# %% ../nbs/62_multispectral.ipynb 12
+# %% ../nbs/62_multispectral.ipynb 13
 @patch
 def _get_bands(self: BandInputs, ids: list[str]) -> tuple[int]:
     assert set(ids).issubset(set(self.ids))
     return tuple(self._get_index(id) for id in ids)
 
-# %% ../nbs/62_multispectral.ipynb 15
+# %% ../nbs/62_multispectral.ipynb 16
 @patch
 def get_bands_list(self: BandInputs, ids_list: list[list[str]]) -> list[tuple[int]]:
     return [self._get_bands(ids) for ids in ids_list]
 
-# %% ../nbs/62_multispectral.ipynb 18
+# %% ../nbs/62_multispectral.ipynb 19
 class MSDescriptor:
     pass
 
-# %% ../nbs/62_multispectral.ipynb 19
+# %% ../nbs/62_multispectral.ipynb 20
 @patch
 def __init__(self: MSDescriptor, band_ids, brgtX, res_m, rgb_combo): store_attr()
 
-# %% ../nbs/62_multispectral.ipynb 21
+# %% ../nbs/62_multispectral.ipynb 22
 @patch(cls_method=True)
 def from_all(
     cls: MSDescriptor,
@@ -68,7 +68,7 @@ def from_band_brgt(cls: MSDescriptor, band_ids: tuple(str), brgtX: list[int]):
 def from_bands(cls: MSDescriptor, band_ids: tuple(str)):
     return cls.from_band_brgt(band_ids,[1.0]*len(band_ids))
 
-# %% ../nbs/62_multispectral.ipynb 25
+# %% ../nbs/62_multispectral.ipynb 26
 def createSentinel2Descriptor() -> MSDescriptor:
     return MSDescriptor.from_all(
         ["B01","B02","B03","B04","B05","B06","B07","B08","B8A","B09","B10","B11","B12","AOT"],
@@ -84,33 +84,33 @@ def createSentinel2Descriptor() -> MSDescriptor:
         }
     )
 
-# %% ../nbs/62_multispectral.ipynb 28
+# %% ../nbs/62_multispectral.ipynb 29
 @patch
 def get_res_ids(self: MSDescriptor, res: int) -> list[str]:
     indices = [i for i,r in enumerate(self.res_m) if r == res]
     return [self.band_ids[i] for i in indices]
 
-# %% ../nbs/62_multispectral.ipynb 31
+# %% ../nbs/62_multispectral.ipynb 32
 @patch
 def get_brgtX(self: MSDescriptor, ids: list[str]) -> list[float]:
     indices = [self.band_ids.index(id) for id in ids]
     return [self.brgtX[i] for i in indices]
 
-# %% ../nbs/62_multispectral.ipynb 34
+# %% ../nbs/62_multispectral.ipynb 35
 @patch
 def get_brgtX_list(self: MSDescriptor, ids_list: list[list[str]]) -> list[list[float]]:
     return [self.get_brgtX(ids) for ids in ids_list]
 
-# %% ../nbs/62_multispectral.ipynb 37
+# %% ../nbs/62_multispectral.ipynb 38
 class MSData:
     pass
 
-# %% ../nbs/62_multispectral.ipynb 38
+# %% ../nbs/62_multispectral.ipynb 39
 @patch
 def __init__(self: MSData, ms_descriptor, bands, chn_grp_ids, files_getter, chan_io_fn):
     store_attr()
 
-# %% ../nbs/62_multispectral.ipynb 39
+# %% ../nbs/62_multispectral.ipynb 40
 @patch(cls_method=True)
 def from_all(
     cls: MSData,
@@ -122,7 +122,7 @@ def from_all(
 ):
     return cls(ms_descriptor,BandInputs.from_ids(band_ids),chn_grp_ids,files_getter,chan_io_fn)
 
-# %% ../nbs/62_multispectral.ipynb 48
+# %% ../nbs/62_multispectral.ipynb 49
 @patch
 def _load_image(self: MSData, img_id, cls: TensorImage) -> TensorImage:
     files = self.files_getter(self.bands.ids, img_id)
@@ -135,16 +135,16 @@ def _load_image(self: MSData, img_id, cls: TensorImage) -> TensorImage:
 def load_image(self: MSData, img_id) -> TensorImageMS:
     return self._load_image(img_id, TensorImageMS)                
 
-# %% ../nbs/62_multispectral.ipynb 49
+# %% ../nbs/62_multispectral.ipynb 50
 @patch
 def num_channels(self: MSData) -> int:
     return len(self.bands.ids)
 
-# %% ../nbs/62_multispectral.ipynb 54
+# %% ../nbs/62_multispectral.ipynb 55
 class MaskData:
     pass
 
-# %% ../nbs/62_multispectral.ipynb 55
+# %% ../nbs/62_multispectral.ipynb 56
 @patch
 def __init__(
     self: MaskData,
@@ -155,26 +155,26 @@ def __init__(
 ):
     store_attr()
 
-# %% ../nbs/62_multispectral.ipynb 56
+# %% ../nbs/62_multispectral.ipynb 57
 @patch
 def load_mask(self: MaskData, img_id) -> TensorMask:
     file = self.files_getter([self.mask_id], img_id)[0]
     return self.mask_io_fn(file)
 
-# %% ../nbs/62_multispectral.ipynb 57
+# %% ../nbs/62_multispectral.ipynb 58
 @patch
 def num_channels(self: MaskData) -> int:
     return len(self.mask_codes)
 
-# %% ../nbs/62_multispectral.ipynb 60
+# %% ../nbs/62_multispectral.ipynb 61
 class MSAugment:
     pass
 
-# %% ../nbs/62_multispectral.ipynb 61
+# %% ../nbs/62_multispectral.ipynb 62
 @patch
 def __init__(self: MSAugment,train_aug=None,valid_aug=None): store_attr()
 
-# %% ../nbs/62_multispectral.ipynb 63
+# %% ../nbs/62_multispectral.ipynb 64
 @patch
 def create_xform_block(self: MSData) -> DataBlock:
     return TransformBlock(
@@ -183,7 +183,7 @@ def create_xform_block(self: MSData) -> DataBlock:
         ]
     )
 
-# %% ../nbs/62_multispectral.ipynb 64
+# %% ../nbs/62_multispectral.ipynb 65
 @patch
 def create_xform_block(self: MaskData) -> DataBlock:
     return TransformBlock(
@@ -193,7 +193,7 @@ def create_xform_block(self: MaskData) -> DataBlock:
         ]
     )
 
-# %% ../nbs/62_multispectral.ipynb 65
+# %% ../nbs/62_multispectral.ipynb 66
 @patch
 def create_item_xforms(self: MSAugment) -> list(ItemTransform):
     if self.train_aug is None and self.valid_aug is None:
@@ -205,16 +205,16 @@ def create_item_xforms(self: MSAugment) -> list(ItemTransform):
     else:
         return [TrainMSSAT(self.train_aug),ValidMSSAT(self.valid_aug)]
 
-# %% ../nbs/62_multispectral.ipynb 67
+# %% ../nbs/62_multispectral.ipynb 68
 class FastGS:
     pass
 
-# %% ../nbs/62_multispectral.ipynb 68
+# %% ../nbs/62_multispectral.ipynb 69
 @patch
 def __init__(self: FastGS, ms_data: MSData, mask_data: MaskData, ms_aug: MSAugment=MSAugment()):
     store_attr()
 
-# %% ../nbs/62_multispectral.ipynb 70
+# %% ../nbs/62_multispectral.ipynb 71
 @patch
 def create_data_block(self: FastGS, splitter=RandomSplitter(valid_pct=0.2, seed=107)) -> DataBlock:
     return DataBlock(
@@ -223,7 +223,7 @@ def create_data_block(self: FastGS, splitter=RandomSplitter(valid_pct=0.2, seed=
         item_tfms=self.ms_aug.create_item_xforms()
     )
 
-# %% ../nbs/62_multispectral.ipynb 72
+# %% ../nbs/62_multispectral.ipynb 73
 @patch
 def create_unet_learner(self: FastGS,dl,model,pretrained=True,loss_func=CrossEntropyLossFlat(axis=1),metrics=Dice(axis=1),reweight=None) -> Learner:
     learner = unet_learner(
