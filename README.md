@@ -92,7 +92,10 @@ snt12_imgs = MSData.from_all(
 )
 ```
 
-The second parameter is a list of 4 channel lists. Each channel list
+The second parameter is a list of ids of channel to be loaded into the
+image tensor, in the same order as in this list.
+
+The third parameter is a list of 4 channel lists. Each channel list
 describes one image that will be displayed. The lists that have 3
 channel ids will map those channels to the R,G,B inputs of a
 “false-colour” image. Lists with a single channel id will be mapped to
@@ -106,8 +109,8 @@ maps B12, B11, B8A to a false-colour image. Finally the one remaining
 channel B08 is mapped to a monochrome image. Thus all the channels in
 the image are displayed.
 
-The third parameter is a function that maps channel id’s to filenames
-that select the image data for a single channel. The final parameter is
+The fourth parameter is a function that maps channel id’s to filenames
+that provide the image data for a single channel. The final parameter is
 an IO function that loads a complete TensorImageMS given the list of
 files corresponding to individual channels.
 
@@ -210,6 +213,21 @@ learner.fit_one_cycle(1)
 learner.show_results(mskovl=False)
 ```
 
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: left;">
@@ -231,6 +249,22 @@ learner.show_results(mskovl=False)
   </tbody>
 </table>
 
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+
 ![](index_files/figure-gfm/cell-13-output-5.png)
 
 Finally, we can look at the top losses
@@ -239,6 +273,39 @@ Finally, we can look at the top losses
 interp = SegmentationInterpretation.from_learner(learner)
 interp.plot_top_losses(k=1,mskovl=False)
 ```
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
 
 ![](index_files/figure-gfm/cell-14-output-5.png)
 
