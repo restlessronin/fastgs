@@ -93,7 +93,7 @@ snt12_imgs = MSData.from_all(
 ```
 
 The second parameter is a list of ids of channel to be loaded into the
-image tensor, in the same order as in this list.
+image tensor, in the order in which they are loaded.
 
 The third parameter is a list of 4 channel lists. Each channel list
 describes one image that will be displayed. The lists that have 3
