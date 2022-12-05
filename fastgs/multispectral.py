@@ -177,33 +177,25 @@ def __init__(self: MSAugment,train_aug=None,valid_aug=None): store_attr()
 # %% ../nbs/62_multispectral.ipynb 64
 @patch
 def create_xform_block(self: MSData) -> DataBlock:
-    return TransformBlock(
-        type_tfms=[
-            partial(MSData.load_image, self),
-        ]
-    )
+    return TransformBlock(type_tfms=[
+            partial(MSData.load_image,self),
+        ])
 
 # %% ../nbs/62_multispectral.ipynb 65
 @patch
 def create_xform_block(self: MaskData) -> DataBlock:
-    return TransformBlock(
-        type_tfms=[
-            partial(MaskData.load_mask, self),
+    return TransformBlock(type_tfms=[
+            partial(MaskData.load_mask,self),
             AddMaskCodes(codes=self.mask_codes),
-        ]
-    )
+        ])
 
 # %% ../nbs/62_multispectral.ipynb 66
 @patch
 def create_item_xforms(self: MSAugment) -> list(ItemTransform):
-    if self.train_aug is None and self.valid_aug is None:
-        return []
-    elif self.valid_aug is None:
-        return [TrainMSSAT(self.train_aug)]
-    elif self.train_aug is None:
-        return [ValidMSSAT(self.train_aug)]
-    else:
-        return [TrainMSSAT(self.train_aug),ValidMSSAT(self.valid_aug)]
+    if self.train_aug is None and self.valid_aug is None: return []
+    elif self.valid_aug is None: return [TrainMSSAT(self.train_aug)]
+    elif self.train_aug is None: return [ValidMSSAT(self.valid_aug)]
+    else: return [TrainMSSAT(self.train_aug),ValidMSSAT(self.valid_aug)]
 
 # %% ../nbs/62_multispectral.ipynb 68
 class FastGS:
@@ -218,17 +210,17 @@ def __init__(self: FastGS, ms_data: MSData, mask_data: MaskData, ms_aug: MSAugme
 @patch
 def create_data_block(self: FastGS, splitter=RandomSplitter(valid_pct=0.2, seed=107)) -> DataBlock:
     return DataBlock(
-        blocks=(self.ms_data.create_xform_block(), self.mask_data.create_xform_block()),
+        blocks=(self.ms_data.create_xform_block(),self.mask_data.create_xform_block()),
         splitter=splitter,
         item_tfms=self.ms_aug.create_item_xforms()
     )
 
 # %% ../nbs/62_multispectral.ipynb 73
 @patch
-def create_unet_learner(self: FastGS,dl,model,pretrained=True,loss_func=CrossEntropyLossFlat(axis=1),metrics=Dice(axis=1),reweight=None) -> Learner:
+def create_unet_learner(self: FastGS,dl,model,pretrained=True,loss_func=CrossEntropyLossFlat(axis=1),metrics=Dice(axis=1),reweight="avg") -> Learner:
     learner = unet_learner(
         dl,model,n_in=len(self.ms_data.bands.ids),n_out=len(self.mask_data.mask_codes),
-        pretrained=pretrained, loss_func=loss_func,metrics=metrics
+        pretrained=pretrained,loss_func=loss_func,metrics=metrics
     )
     if pretrained:
         learner.model[0][0].fastgs_reinit_weights(reweight=reweight)
