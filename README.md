@@ -6,7 +6,7 @@ Welcome to fastgs
 ## Introduction
 
 **This library is currently in *alpha*, neither the functionality nor
-the API is stable**
+the API is stable**. Feedback / PR’s welcome!
 
 This library provides geospatial multi-spectral image support for
 fastai. FastAI already has extensive support for RGB images in the
@@ -213,6 +213,26 @@ learner.fit_one_cycle(1)
 learner.show_results(mskovl=False)
 ```
 
+    /opt/homebrew/Caskroom/miniforge/base/envs/fastgs/lib/python3.10/site-packages/torchvision/models/_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
+      warnings.warn(
+    /opt/homebrew/Caskroom/miniforge/base/envs/fastgs/lib/python3.10/site-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=ResNet18_Weights.IMAGENET1K_V1`. You can also use `weights=ResNet18_Weights.DEFAULT` to get the most up-to-date weights.
+      warnings.warn(msg)
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: left;">
@@ -226,15 +246,31 @@ learner.show_results(mskovl=False)
   <tbody>
     <tr>
       <td>0</td>
-      <td>0.664981</td>
-      <td>0.477103</td>
-      <td>0.009395</td>
-      <td>00:21</td>
+      <td>0.858259</td>
+      <td>0.631103</td>
+      <td>0.036843</td>
+      <td>00:25</td>
     </tr>
   </tbody>
 </table>
 
-![](index_files/figure-gfm/cell-13-output-5.png)
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+
+![](index_files/figure-gfm/cell-13-output-6.png)
 
 Finally, we can look at the top losses
 
@@ -243,6 +279,39 @@ interp = SegmentationInterpretation.from_learner(learner)
 interp.plot_top_losses(k=1,mskovl=False)
 ```
 
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+
+
+<style>
+    /* Turns off some styling */
+    progress {
+        /* gets rid of default border in Firefox and Opera. */
+        border: none;
+        /* Needs to be in here for Safari polyfill so background images work as expected. */
+        background-size: auto;
+    }
+    progress:not([value]), progress:not([value])::-webkit-progress-bar {
+        background: repeating-linear-gradient(45deg, #7e7e7e, #7e7e7e 10px, #5c5c5c 10px, #5c5c5c 20px);
+    }
+    .progress-bar-interrupted, .progress-bar-interrupted::-webkit-progress-bar {
+        background: #F44336;
+    }
+</style>
+
 ![](index_files/figure-gfm/cell-14-output-5.png)
 
 ## Acknowledgements
@@ -250,7 +319,9 @@ interp.plot_top_losses(k=1,mskovl=False)
 This library is inspired by the following notebooks (and related works
 by the authors)
 
-- Mauricio Cordeiro’s [multi-spectral segmentation fastai
+- [@cordmaur](https://github.com/cordmaur) - Mauricio Cordeiro’s
+  [multi-spectral segmentation fastai
   pipeline](https://www.kaggle.com/code/cordmaur/remotesensing-fastai2-multiband-augmentations/notebook)
-- Nick Wright’s [multi-spectral classification
+- [@wrignj08](https://github.com/wrignj08) - Nick Wright’s
+  [multi-spectral classification
   notebook](https://dpird-dma.github.io/blog/Multispectral-image-classification-Transfer-Learning//)
