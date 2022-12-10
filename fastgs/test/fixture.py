@@ -15,7 +15,7 @@ from ..multispectral import *
 # %% ../../nbs/001_test.fixture.ipynb 5
 def _get_11b_msdata():
     sentinel2 = createSentinel2Descriptor()
-    return MSData.from_all(
+    return MSData.from_files(
         sentinel2,
         ["B02","B03","B04","B05","B06","B07","B08","B8A","B11","B12","AOT"],
         [sentinel2.rgb_combo["natural_color"], ["B07","B06","B05"],["B12","B11","B8A"],["B08"]],
@@ -24,7 +24,7 @@ def _get_11b_msdata():
     )
 
 def _get_mask_data():
-    return MaskData("LC",get_channel_filenames,read_mask_file,["non-buildings","buildings"])
+    return MaskData.from_files("LC",get_channel_filenames,read_mask_file,["non-buildings","buildings"])
 
 def _get_augs():
     return MSAugment()
