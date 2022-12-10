@@ -14,6 +14,7 @@ from fastai.vision.all import *
 from .vision.core import *
 from .vision.augment import *
 from .vision.learner import *
+from .vision.load import *
 
 # %% ../nbs/62_multispectral.ipynb 6
 @dataclass
@@ -107,7 +108,13 @@ class MSData:
 
 # %% ../nbs/62_multispectral.ipynb 39
 @patch
-def __init__(self: MSData, ms_descriptor, bands, chn_grp_ids, files_getter, chan_io_fn):
+def __init__(
+    self: MSData,
+    ms_descriptor: MSDescriptor,
+    bands: BandInputs,
+    chn_grp_ids: list[list[str]],
+    tensor_getter: MSTensorGetter
+):
     store_attr()
 
 # %% ../nbs/62_multispectral.ipynb 40
@@ -120,16 +127,27 @@ def from_all(
     files_getter: Callable[[list[str], Any], list[str]],
     chan_io_fn: Callable[[list[str]], Tensor]
 ):
-    return cls(ms_descriptor,BandInputs.from_ids(band_ids),chn_grp_ids,files_getter,chan_io_fn)
+    tensor_getter = MSTensorGetter.from_files(files_getter,chan_io_fn)
+    return cls(ms_descriptor,BandInputs.from_ids(band_ids),chn_grp_ids,tensor_getter)
+
+@patch(cls_method=True)
+def from_delegate(
+    cls: MSData,
+    ms_descriptor: MSDescriptor,
+    band_ids: list[str],
+    chn_grp_ids: list[list[str]],
+    tg_fn: Callable[[list[str], Any], Tensor]
+):
+    tensor_getter = MSTensorGetter.from_delegate(tg_fn)
+    return cls(ms_descriptor,BandInputs.from_ids(band_ids),chn_grp_ids,tensor_getter)
 
 # %% ../nbs/62_multispectral.ipynb 49
 @patch
 def _load_image(self: MSData, img_id, cls: TensorImage) -> TensorImage:
-    files = self.files_getter(self.bands.ids, img_id)
     ids_list = self.chn_grp_ids
     bands = self.bands.get_bands_list(ids_list)
     brgtX = self.ms_descriptor.get_brgtX_list(ids_list)
-    return cls(self.chan_io_fn(files), bands=bands, brgtX=brgtX)
+    return cls(self.tensor_getter.load_tensor(self.bands.ids, img_id), bands=bands, brgtX=brgtX)
 
 @patch
 def load_image(self: MSData, img_id) -> TensorImageMS:
