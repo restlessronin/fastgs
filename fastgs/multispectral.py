@@ -14,6 +14,7 @@ from fastai.vision.all import *
 from .vision.core import *
 from .vision.augment import *
 from .vision.learner import *
+from .vision.load import *
 
 # %% ../nbs/62_multispectral.ipynb 6
 @dataclass
@@ -107,12 +108,18 @@ class MSData:
 
 # %% ../nbs/62_multispectral.ipynb 39
 @patch
-def __init__(self: MSData, ms_descriptor, bands, chn_grp_ids, files_getter, chan_io_fn):
+def __init__(
+    self: MSData,
+    ms_descriptor: MSDescriptor,
+    bands: BandInputs,
+    chn_grp_ids: list[list[str]],
+    tensor_getter: MSTensorGetter
+):
     store_attr()
 
 # %% ../nbs/62_multispectral.ipynb 40
 @patch(cls_method=True)
-def from_all(
+def from_files(
     cls: MSData,
     ms_descriptor: MSDescriptor,
     band_ids: list[str],
@@ -120,16 +127,27 @@ def from_all(
     files_getter: Callable[[list[str], Any], list[str]],
     chan_io_fn: Callable[[list[str]], Tensor]
 ):
-    return cls(ms_descriptor,BandInputs.from_ids(band_ids),chn_grp_ids,files_getter,chan_io_fn)
+    tensor_getter = MSTensorGetter.from_files(files_getter,chan_io_fn)
+    return cls(ms_descriptor,BandInputs.from_ids(band_ids),chn_grp_ids,tensor_getter)
+
+@patch(cls_method=True)
+def from_delegate(
+    cls: MSData,
+    ms_descriptor: MSDescriptor,
+    band_ids: list[str],
+    chn_grp_ids: list[list[str]],
+    tg_fn: Callable[[list[str], Any], Tensor]
+):
+    tensor_getter = MSTensorGetter.from_delegate(tg_fn)
+    return cls(ms_descriptor,BandInputs.from_ids(band_ids),chn_grp_ids,tensor_getter)
 
 # %% ../nbs/62_multispectral.ipynb 49
 @patch
 def _load_image(self: MSData, img_id, cls: TensorImage) -> TensorImage:
-    files = self.files_getter(self.bands.ids, img_id)
     ids_list = self.chn_grp_ids
     bands = self.bands.get_bands_list(ids_list)
     brgtX = self.ms_descriptor.get_brgtX_list(ids_list)
-    return cls(self.chan_io_fn(files), bands=bands, brgtX=brgtX)
+    return cls(self.tensor_getter.load_tensor(self.bands.ids, img_id), bands=bands, brgtX=brgtX)
 
 @patch
 def load_image(self: MSData, img_id) -> TensorImageMS:
@@ -149,8 +167,7 @@ class MaskData:
 def __init__(
     self: MaskData,
     mask_id: str,
-    files_getter: Callable[[list[str], Any], list[str]],
-    mask_io_fn: Callable[[list[str]], TensorMask],
+    mask_getter: Callable[[list[str], Any], TensorMask],
     mask_codes: list[str]
 ):
     store_attr()
@@ -158,30 +175,51 @@ def __init__(
 # %% ../nbs/62_multispectral.ipynb 57
 @patch
 def load_mask(self: MaskData, img_id) -> TensorMask:
-    file = self.files_getter([self.mask_id], img_id)[0]
-    return self.mask_io_fn(file)
+    return self.mask_getter.load_mask(self.mask_id, img_id)
 
 # %% ../nbs/62_multispectral.ipynb 58
 @patch
 def num_channels(self: MaskData) -> int:
     return len(self.mask_codes)
 
-# %% ../nbs/62_multispectral.ipynb 61
+# %% ../nbs/62_multispectral.ipynb 59
+@patch(cls_method=True)
+def from_files(
+    cls: MaskData,
+    mask_id: str,
+    files_getter: Callable[[list[str], Any], list[str]],
+    mask_io_fn: Callable[[list[str]], Tensor],
+    mask_codes: list[str]
+):
+    mask_getter = MSMaskGetter.from_files(files_getter,mask_io_fn)
+    return cls(mask_id,mask_getter,mask_codes)
+
+@patch(cls_method=True)
+def from_delegate(
+    cls: MaskData,
+    mask_id: str,
+    tg_fn: Callable[[list[str], Any], Tensor],
+    mask_codes: list[str]
+):
+    mask_getter = MSMaskGetter.from_delegate(tg_fn)
+    return cls(mask_id,mask_getter,mask_codes)
+
+# %% ../nbs/62_multispectral.ipynb 62
 class MSAugment:
     pass
 
-# %% ../nbs/62_multispectral.ipynb 62
+# %% ../nbs/62_multispectral.ipynb 63
 @patch
 def __init__(self: MSAugment,train_aug=None,valid_aug=None): store_attr()
 
-# %% ../nbs/62_multispectral.ipynb 64
+# %% ../nbs/62_multispectral.ipynb 65
 @patch
 def create_xform_block(self: MSData) -> DataBlock:
     return TransformBlock(type_tfms=[
             partial(MSData.load_image,self),
         ])
 
-# %% ../nbs/62_multispectral.ipynb 65
+# %% ../nbs/62_multispectral.ipynb 66
 @patch
 def create_xform_block(self: MaskData) -> DataBlock:
     return TransformBlock(type_tfms=[
@@ -189,7 +227,7 @@ def create_xform_block(self: MaskData) -> DataBlock:
             AddMaskCodes(codes=self.mask_codes),
         ])
 
-# %% ../nbs/62_multispectral.ipynb 66
+# %% ../nbs/62_multispectral.ipynb 67
 @patch
 def create_item_xforms(self: MSAugment) -> list(ItemTransform):
     if self.train_aug is None and self.valid_aug is None: return []
@@ -197,16 +235,16 @@ def create_item_xforms(self: MSAugment) -> list(ItemTransform):
     elif self.train_aug is None: return [ValidMSSAT(self.valid_aug)]
     else: return [TrainMSSAT(self.train_aug),ValidMSSAT(self.valid_aug)]
 
-# %% ../nbs/62_multispectral.ipynb 68
+# %% ../nbs/62_multispectral.ipynb 69
 class FastGS:
     pass
 
-# %% ../nbs/62_multispectral.ipynb 69
+# %% ../nbs/62_multispectral.ipynb 70
 @patch
 def __init__(self: FastGS, ms_data: MSData, mask_data: MaskData, ms_aug: MSAugment=MSAugment()):
     store_attr()
 
-# %% ../nbs/62_multispectral.ipynb 71
+# %% ../nbs/62_multispectral.ipynb 72
 @patch
 def create_data_block(self: FastGS, splitter=RandomSplitter(valid_pct=0.2, seed=107)) -> DataBlock:
     return DataBlock(
@@ -215,7 +253,7 @@ def create_data_block(self: FastGS, splitter=RandomSplitter(valid_pct=0.2, seed=
         item_tfms=self.ms_aug.create_item_xforms()
     )
 
-# %% ../nbs/62_multispectral.ipynb 73
+# %% ../nbs/62_multispectral.ipynb 74
 @patch
 def create_unet_learner(self: FastGS,dl,model,pretrained=True,loss_func=CrossEntropyLossFlat(axis=1),metrics=Dice(axis=1),reweight="avg") -> Learner:
     learner = unet_learner(
