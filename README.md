@@ -18,9 +18,16 @@ imaging.
 
 Complete examples are provided in the following notebooks
 
-1.  working with the kaggle [38-cloud/95-cloud landsat
+1.  working with a netCDF sample
+    [KappaSet](https://www.kaggle.com/code/restlessronin/netcdf-demo-fastai-using-fastgs).
+    demo code for brightness factor calculation by
+    [@wrignj08](https://github.com/wrignj08). Shows how to load images
+    with all channels stored in a single netCDF file.
+2.  working with the kaggle [38-cloud/95-cloud landsat
     dataset](https://www.kaggle.com/code/restlessronin/cloud95-fastai-with-fastgs-multispectral-support).
-2.  working on a segmentation problem with a [Sentinel 2
+    Shows how to load images stored in a “single channel per file”
+    format (seems to be the common case).
+3.  working on a segmentation problem with a [Sentinel 2
     dataset](https://www.kaggle.com/code/restlessronin/lila-sentinel-2-segmentation-with-fastai)
 
 These are boths works in progress and optimized to display the features
@@ -126,7 +133,7 @@ img12.show()
 
     [<AxesSubplot:>, <AxesSubplot:>, <AxesSubplot:>, <AxesSubplot:>]
 
-![](index_files/figure-gfm/cell-4-output-2.png)
+![](index_files/figure-commonmark/cell-4-output-2.png)
 
 Note that the single MS image is displayed as 4 images, each
 corresponding to one of the channel lists we provided. The first image
@@ -196,13 +203,13 @@ from fastgs.vision.augment import *
 dl.train.show_batch(max_n=3,mskovl=False) # don't overlay mask
 ```
 
-![](index_files/figure-gfm/cell-11-output-1.png)
+![](index_files/figure-commonmark/cell-11-output-1.png)
 
 ``` python
 dl.valid.show_batch(mskovl=False)
 ```
 
-![](index_files/figure-gfm/cell-12-output-1.png)
+![](index_files/figure-commonmark/cell-12-output-1.png)
 
 We create and train a unet learner and look at results. Image is in
 first 4 columns, mask in the 5th and prediction in the 6th.
@@ -239,7 +246,7 @@ learner.show_results(mskovl=False)
   </tbody>
 </table>
 
-![](index_files/figure-gfm/cell-13-output-6.png)
+![](index_files/figure-commonmark/cell-13-output-6.png)
 
 Finally, we can look at the top losses
 
@@ -248,7 +255,7 @@ interp = SegmentationInterpretation.from_learner(learner)
 interp.plot_top_losses(k=1,mskovl=False)
 ```
 
-![](index_files/figure-gfm/cell-14-output-5.png)
+![](index_files/figure-commonmark/cell-14-output-5.png)
 
 ## Acknowledgements
 
