@@ -1,0 +1,198 @@
+[
+  {
+    "objectID": "vision.data.html",
+    "href": "vision.data.html",
+    "title": "Vision data",
+    "section": "",
+    "text": "Let’s see this in action for 1 sample\n\nfrom fastgs.test.fixture import *\n\nLoad sample image and mask from test fixture\n\n(elvn_imgs,elvn_mask) = get_11b_test_tuple()\n\n\ndef _show_one(mskovl):\n    rowcx = _get_sample_ctxs(elvn_imgs.num_images(), 1, mskovl)\n    _show_one_sample(elvn_imgs, elvn_mask, rowcx[0], mskovl)\n\nFirst we see one MSData image with overlaid mask\n\n_show_one(True)\n\n\n\n\nNext we see the same image with the mask as a separate column\n\n_show_one(False)\n\n\n\n\n\nfrom fastgs.test.fixture import *\n\n\ndl = get_11b_test_dl()\n\n\nb = dl.show_batch(max_n=3,mskovl=False)\n\n\n\n\n\nb = dl.show_batch(max_n=3)"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Welcome to fastgs",
+    "section": "",
+    "text": "This library is currently in alpha, neither the functionality nor the API is stable. Feedback / PR’s welcome!\nThis library provides geospatial multi-spectral image support for fastai. FastAI already has extensive support for RGB images in the pipeline. I try to achieve feature parity for multi-spectral images with this library, specifically in the context of Sentinel 2 geospatial imaging."
+  },
+  {
+    "objectID": "index.html#demo-notebooks",
+    "href": "index.html#demo-notebooks",
+    "title": "Welcome to fastgs",
+    "section": "Demo Notebooks",
+    "text": "Demo Notebooks\nComplete examples are provided in the following notebooks\n\nworking with a netCDF sample KappaSet. demo code for brightness factor calculation by @wrignj08. Shows how to load images with all channels stored in a single netCDF file.\nworking with the kaggle 38-cloud/95-cloud landsat dataset. Shows how to load images stored in a “single channel per file” format (seems to be the common case).\nworking on a segmentation problem with a Sentinel 2 dataset\n\nThese are boths works in progress and optimized to display the features of the library, rather than the best possible results. Even so, the “cloud 95” notebook is providing results comparable to other hiqh quality notebooks on the same dataset."
+  },
+  {
+    "objectID": "index.html#install",
+    "href": "index.html#install",
+    "title": "Welcome to fastgs",
+    "section": "Install",
+    "text": "Install\npip install -Uqq fastgs\nconda install -c restlessronin fastgs"
+  },
+  {
+    "objectID": "index.html#multi-spectral-visualization",
+    "href": "index.html#multi-spectral-visualization",
+    "title": "Welcome to fastgs",
+    "section": "Multi-spectral visualization",
+    "text": "Multi-spectral visualization\nOne key problem that is solved is visualization of multi-spectral data, which has more than the three R, G, B channels.\nWe introduce a new category of pytorch tensor, TensorImageMS, that shows multiple images. In addition to the normal RGB image, it handles extra channels by displaying them as additional images, either in sets of false-colour RGB images, or as ‘monochrome’ images (one per channel).\nThere is also experimental support (not integrated into the API yet) for mapping multi-spectral images to an animation of multiple images. Feedback on it’s usefulness is welcome!\nThe first use-case is Sentinel 2 images, which are naturally “dark”. There is a provision to provide “brightening” multipliers during display, customizable per channel."
+  },
+  {
+    "objectID": "index.html#image-data-class",
+    "href": "index.html#image-data-class",
+    "title": "Welcome to fastgs",
+    "section": "Image data class",
+    "text": "Image data class\nA high-level API, MSData is exposed that knows how to load multispectral images given some parameters.\n\nfrom fastgs.multispectral import *\n\nThe following code creates a class that can load 11 Sentinel 2 channels into a TensorImageMS. The first parameter is a descriptor that provides mapping from Sentinel 2 channels to brightening factors and other parameters specific to the inputs. This will generally be tailored to your image dataset.\n\nfrom fastgs.test.io import * # defines file naming and io for our test samples\n\nsentinel2 = createSentinel2Descriptor()\n\nsnt12_imgs = MSData.from_files(\n    sentinel2,\n    # B04 and B02 are transposed so that the first 3 channels are natural R,G,B channels\n    [\"B04\",\"B03\",\"B02\",\"B05\",\"B06\",\"B07\",\"B08\",\"B8A\",\"B11\",\"B12\",\"AOT\"],\n    [[\"B04\",\"B03\",\"B02\"],[\"B07\",\"B06\",\"B05\"],[\"B12\",\"B11\",\"B8A\"],[\"B08\"]],\n    get_channel_filenames,\n    read_multichan_files\n)\n\nThe second parameter is a list of ids of channel to be loaded into the image tensor, in the order in which they are loaded.\nThe third parameter is a list of 4 channel lists. Each channel list describes one image that will be displayed. The lists that have 3 channel ids will map those channels to the R,G,B inputs of a “false-colour” image. Lists with a single channel id will be mapped to monochrome images.\nIn this example, we will display 4 images per MS image. The first maps the “real” RGB channels (B04, B03, B02) of Sentinel 2 data to an RGB image, which makes this a true-colour image. The second image maps channels B07, B06, B05 to a false-colour image. Likewise the third image maps B12, B11, B8A to a false-colour image. Finally the one remaining channel B08 is mapped to a monochrome image. Thus all the channels in the image are displayed.\nThe fourth parameter is a function that maps channel id’s to filenames that provide the image data for a single channel. The final parameter is an IO function that loads a complete TensorImageMS given the list of files corresponding to individual channels."
+  },
+  {
+    "objectID": "index.html#image-display",
+    "href": "index.html#image-display",
+    "title": "Welcome to fastgs",
+    "section": "Image display",
+    "text": "Image display\nThe simplest use of the high-level wrapper class is to load an indvidual MS image.\n\nimg12 = snt12_imgs.load_image(66)\nimg12.show()\n\n[<AxesSubplot:title={'center':'B04,B03,B02'}>,\n <AxesSubplot:title={'center':'B07,B06,B05'}>,\n <AxesSubplot:title={'center':'B12,B11,B8A'}>,\n <AxesSubplot:title={'center':'B08'}>]\n\n\n\n\n\nNote that the single MS image is displayed as 4 images, each corresponding to one of the channel lists we provided. The first image is the true-colour image, the next 2 are false colour, and the final one is monochrome."
+  },
+  {
+    "objectID": "index.html#high-level-wrapper-fastgs-for-semantic-segmentation",
+    "href": "index.html#high-level-wrapper-fastgs-for-semantic-segmentation",
+    "title": "Welcome to fastgs",
+    "section": "High level wrapper FastGS for semantic segmentation",
+    "text": "High level wrapper FastGS for semantic segmentation\nWe also provide a high-level wrapper FastGS which generates fastai dataloaders and learners for semantic segmentation using unets. Providing support for other models and for classification should be straightforward.\n\nMaskData\nContinuing our example, we provide mask information using a wrapper class for segmentation mask loading (this is analogous to the MSData class, but for ‘normal’ TensorImages).\n\nmsks = MaskData.from_files(\"LC\",get_channel_filenames,read_mask_file,[\"non-building\",\"building\"])\n\n\n\nMSAugment\nWe also provide a wrapper class that can specify which (if any) augmentations to use during training and validation, using the albumentations library (which works for multi-spectral data).\n\nimport albumentations as A\n\nHere we just use demo augmentations\n\naugs = MSAugment(train_aug=A.Rotate(p=1),valid_aug=A.HorizontalFlip(p=0.33))\n\nNow we create the actual high level wrapper\n\nfastgs = FastGS(snt12_imgs,msks,augs)\n\nCreate a datablock and a data loader\n\ndb = fastgs.create_data_block()\ndl = db.dataloaders(source=[66]*10,bs=8) # repeat the sample image 10 times\n\nNow we can see the visualization support in action. Let’s look at some training and validation batches (with augmentation). Each row shows the image in 4 columns and the mask in the 5th.\n\nfrom fastai.vision.all import *\nfrom fastgs.vision.data import *\nfrom fastgs.vision.learner import *\nfrom fastgs.vision.augment import *\n\n\ndl.train.show_batch(max_n=3,mskovl=False) # don't overlay mask\n\n\n\n\n\ndl.valid.show_batch(mskovl=False)\n\n\n\n\nWe create and train a unet learner and look at results. Image is in first 4 columns, mask in the 5th and prediction in the 6th.\n\nlearner = fastgs.create_unet_learner(dl, resnet18,reweight=\"avg\") # weights of n > 3 channels are set to average of first 3 channels\nlearner.fit_one_cycle(1)\nlearner.show_results(mskovl=False)\n\n/opt/homebrew/Caskroom/miniforge/base/envs/fastgs/lib/python3.10/site-packages/torchvision/models/_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.\n  warnings.warn(\n/opt/homebrew/Caskroom/miniforge/base/envs/fastgs/lib/python3.10/site-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=ResNet18_Weights.IMAGENET1K_V1`. You can also use `weights=ResNet18_Weights.DEFAULT` to get the most up-to-date weights.\n  warnings.warn(msg)\n\n\n\n\n\n\n\n\n  \n    \n      epoch\n      train_loss\n      valid_loss\n      dice\n      time\n    \n  \n  \n    \n      0\n      0.860428\n      0.642802\n      0.032248\n      00:22\n    \n  \n\n\n\n\n\n\n\n\n\n\n\n\n\nFinally, we can look at the top losses\n\ninterp = SegmentationInterpretation.from_learner(learner)\ninterp.plot_top_losses(k=1,mskovl=False)"
+  },
+  {
+    "objectID": "index.html#acknowledgements",
+    "href": "index.html#acknowledgements",
+    "title": "Welcome to fastgs",
+    "section": "Acknowledgements",
+    "text": "Acknowledgements\nThis library is inspired by the following notebooks (and related works by the authors)\n\n@cordmaur - Mauricio Cordeiro’s multi-spectral segmentation fastai pipeline\n@wrignj08 - Nick Wright’s multi-spectral classification notebook"
+  },
+  {
+    "objectID": "test.io.html",
+    "href": "test.io.html",
+    "title": "IO operations for Testing",
+    "section": "",
+    "text": "source"
+  },
+  {
+    "objectID": "test.io.html#file-and-directory-names",
+    "href": "test.io.html#file-and-directory-names",
+    "title": "IO operations for Testing",
+    "section": "File and directory names",
+    "text": "File and directory names\n\nsource\n\nget_channel_filenames\n\n get_channel_filenames (chn_ids, tile_idx)\n\nGet list of all channel filenames for one tile idx"
+  },
+  {
+    "objectID": "multispectral.html",
+    "href": "multispectral.html",
+    "title": "High level wrappers",
+    "section": "",
+    "text": "bands.get_captions([[\"B03\",\"B02\",\"B01\"], [\"B01\"], [\"B03\"]]),\n\n(['B03,B02,B01', 'B01', 'B03'],)"
+  },
+  {
+    "objectID": "multispectral.html#msdescriptor",
+    "href": "multispectral.html#msdescriptor",
+    "title": "High level wrappers",
+    "section": "MSDescriptor",
+    "text": "MSDescriptor\nWe need a class that provides basic information about all the channels in the source data. The initial fields are based on the requirements of Sentinel2 images.\n\nsource\n\nMSDescriptor\n\n MSDescriptor ()\n\nInitialize self. See help(type(self)) for accurate signature.\nWe use factories to create sensible defaults\n\nsource\n\n\nMSDescriptor.from_bands\n\nsource\n\n\nMSDescriptor.from_band_brgt\n\nsource\n\n\nMSDescriptor.from_all\n\n@patch\ndef num_bands(self: MSDescriptor) -> int:\n    return len(self.band_ids)\n\n\ntest_eq(MSDescriptor.from_bands([\"B0\"]).num_bands(),1)\n\nThe list of ‘raw’ bands for sentinel 2 images is “B01”,“B02”,“B03”,“B04”,“B05”,“B06”,“B07”,“B08”,“B8A”, “B09”,“B10”,“B11”,“B12”,“AOT”]\nAs described here, these images are naturall “dark” and we allow them to be brightened for display by providing a list of brightening multipliers. For this factory, I have selected values that seem to work well with our data, but it is by no means authoritative.\nThe third parameter is a list of the resolution of each raw band.\nFinally we provide some named groups of 3 bands each, that have been found useful in providing false color images for different applications. The goal is to create (multiple) RGB images, corresponding to such sets of bands, for each multi-spectral tensor.\n\nsource\n\n\ncreateSentinel2Descriptor\n\n createSentinel2Descriptor ()\n\n\nsentinel2 = createSentinel2Descriptor()\n\nThis method lists all bands of a given resolution.\n\nsource\n\n\nMSDescriptor.get_res_ids\n\n MSDescriptor.get_res_ids (res:int)\n\n\ntest_eq(sentinel2.get_res_ids(10),[\"B02\",\"B03\",\"B04\",\"B08\"])\n\nWe can find the brightness multipliers corresponding to a list of channel names with this\n\nsource\n\n\nMSDescriptor.get_brgtX\n\n MSDescriptor.get_brgtX (ids:list[str])\n\n\ntest_eq(sentinel2.get_brgtX([\"B8A\",\"B01\"]), [2.5,2.5])\ntest_eq(sentinel2.get_brgtX(sentinel2.rgb_combo[\"natural_color\"]), [3.75,4.25,4.75])\n\n… and so also the brightness value lists corresponding to name lists\n\nsource\n\n\nMSDescriptor.get_brgtX_list\n\n MSDescriptor.get_brgtX_list (ids_list:list[list[str]])\n\n\ntest_eq(\n    sentinel2.get_brgtX_list([sentinel2.rgb_combo[\"color_infrared\"],[\"B12\",\"B11\"]]), \n    [[1.7,3.75,4.25],[2.2,1.6]]\n)"
+  },
+  {
+    "objectID": "multispectral.html#msdata",
+    "href": "multispectral.html#msdata",
+    "title": "High level wrappers",
+    "section": "MSData",
+    "text": "MSData\nWe then create a MSData wrapper class which takes parameters that specifiy how to load the multi spectral image into a TensorImageMS object.\n\nsource\n\nMSData\n\n MSData ()\n\nInitialize self. See help(type(self)) for accurate signature.\n\nsource\n\n\nMSData.from_delegate\n\n MSData.from_delegate (ms_descriptor:__main__.MSDescriptor,\n                       band_ids:list[str], chn_grp_ids:list[list[str]],\n                       tg_fn:Callable[[list[str],Any],torch.Tensor])\n\n\nsource\n\n\nMSData.from_files\n\n MSData.from_files (ms_descriptor:__main__.MSDescriptor,\n                    band_ids:list[str], chn_grp_ids:list[list[str]],\n                    files_getter:Callable[[list[str],Any],list[str]],\n                    chan_io_fn:Callable[[list[str]],torch.Tensor])\n\n\nfrom fastgs.test.io import *\n\n\ndef get_input(stem: str) -> str:\n    \"Get full input path for stem\"\n    return \"./images/\" + stem\n\ndef tile_img_name(chn_id: str, tile_num: int) -> str:\n    \"File name from channel id and tile number\"\n    return f\"Sentinel20m-{chn_id}-20200215-{tile_num:03d}.png\"\n\ndef get_channel_filenames(chn_ids, tile_idx):\n    \"Get list of all channel filenames for one tile idx\"\n    return [get_input(tile_img_name(x, tile_idx)) for x in chn_ids]\n\nseg_codes = [\"not-cloudy\",\"cloudt\"]\n\nWe can create a sentinel data loader for only the RGB channels\n\nrgb_bands = MSData.from_files(\n    sentinel2,\n    [\"B02\",\"B03\",\"B04\"],\n    [sentinel2.rgb_combo[\"natural_color\"]],\n    get_channel_filenames,\n    read_multichan_files\n)\n\nwhere read_multichan_files_as_tensor is defined here\nor we might choose to only look at the 10m resolution bands\n\ntenm_bands = MSData.from_files(\n    sentinel2,\n    sentinel2.get_res_ids(10),\n    [sentinel2.rgb_combo[\"natural_color\"], [\"B08\"]],\n    get_channel_filenames,\n    read_multichan_files\n)\n\nor even 11 channels of sentinel 2 data\n\nelvn_bands = MSData.from_files(\n    sentinel2,\n    [\"B02\",\"B03\",\"B04\",\"B05\",\"B06\",\"B07\",\"B08\",\"B8A\",\"B11\",\"B12\",\"AOT\"],\n    [sentinel2.rgb_combo[\"natural_color\"], [\"B07\",\"B06\",\"B05\"],[\"B12\",\"B11\",\"B8A\"],[\"B08\"]],\n    get_channel_filenames,\n    read_multichan_files\n)\n\n\nsource\n\n\nMSData.load_image\n\n MSData.load_image (img_id)\n\n\nsource\n\n\nMSData.num_channels\n\n MSData.num_channels ()\n\n\nrgb_tensor = rgb_bands.load_image(66)\ntest_eq(rgb_bands.num_channels(),3)\nrgb_tensor.show()\n\n[<AxesSubplot:title={'center':'B04,B03,B02'}>]\n\n\n\n\n\n\ntenm_tensor = tenm_bands.load_image(66)\ntest_eq(tenm_bands.num_channels(),4)\ntenm_tensor.show()\n\n[<AxesSubplot:title={'center':'B04,B03,B02'}>,\n <AxesSubplot:title={'center':'B08'}>]\n\n\n\n\n\n\nelvn_tensor = elvn_bands.load_image(66)\ntest_eq(elvn_bands.num_channels(),11)\nelvn_tensor.show()\n\n[<AxesSubplot:title={'center':'B04,B03,B02'}>,\n <AxesSubplot:title={'center':'B07,B06,B05'}>,\n <AxesSubplot:title={'center':'B12,B11,B8A'}>,\n <AxesSubplot:title={'center':'B08'}>]"
+  },
+  {
+    "objectID": "multispectral.html#maskdata",
+    "href": "multispectral.html#maskdata",
+    "title": "High level wrappers",
+    "section": "MaskData",
+    "text": "MaskData\nFinally, for convenience, we provide a wrapper class to load mask data\n\nsource\n\nMaskData\n\n MaskData ()\n\nInitialize self. See help(type(self)) for accurate signature.\n\nsource\n\n\nMaskData.load_mask\n\n MaskData.load_mask (img_id)\n\n\nsource\n\n\nMaskData.num_channels\n\n MaskData.num_channels ()\n\n\nsource\n\n\nMaskData.from_delegate\n\n MaskData.from_delegate (mask_id:str,\n                         tg_fn:Callable[[list[str],Any],torch.Tensor],\n                         mask_codes:list[str])\n\n\nsource\n\n\nMaskData.from_files\n\n MaskData.from_files (mask_id:str,\n                      files_getter:Callable[[list[str],Any],list[str]],\n                      mask_io_fn:Callable[[list[str]],torch.Tensor],\n                      mask_codes:list[str])\n\n\nmasks = MaskData.from_files(\"LC\",get_channel_filenames,read_mask_file,[\"non-building\",\"building\"])\ntest_eq(masks.num_channels(),2)\nmask = masks.load_mask(66)\nmask.show()\n\n<AxesSubplot:>"
+  },
+  {
+    "objectID": "multispectral.html#transforms",
+    "href": "multispectral.html#transforms",
+    "title": "High level wrappers",
+    "section": "Transforms",
+    "text": "Transforms\nNext we create the various transforms required for the fastai pipeline\n\nsource\n\nMSData.create_xform_block\n\n MSData.create_xform_block ()\n\n\nsource\n\n\nMaskData.create_xform_block\n\n MaskData.create_xform_block ()\n\n\nsource\n\n\nMSAugment.create_item_xforms"
+  },
+  {
+    "objectID": "multispectral.html#fastgs",
+    "href": "multispectral.html#fastgs",
+    "title": "High level wrappers",
+    "section": "FastGS",
+    "text": "FastGS\nFinally we have a master wrapper class which provides the high level api to create fastai datablocks and learners.\n\nsource\n\nFastGS\n\n FastGS ()\n\nInitialize self. See help(type(self)) for accurate signature.\n\nfgs = FastGS(elvn_bands,masks,MSAugment())\n\n\nsource\n\n\nFastGS.create_data_block\n\n FastGS.create_data_block (splitter=<function _inner>)\n\n\ndb = fgs.create_data_block()\ndl = db.dataloaders([66]*10,bs=8)\n\n\nsource\n\n\nFastGS.create_unet_learner\n\n FastGS.create_unet_learner (dl, model, pretrained=True,\n                             loss_func=FlattenedLoss of\n                             CrossEntropyLoss(),\n                             metrics=<fastai.metrics.Dice object at\n                             0x7f28ab1a5070>, reweight='avg')\n\n\nlearner = fgs.create_unet_learner(dl,resnet18)\n\n/opt/homebrew/Caskroom/miniforge/base/envs/fastgs/lib/python3.10/site-packages/torchvision/models/_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.\n  warnings.warn(\n/opt/homebrew/Caskroom/miniforge/base/envs/fastgs/lib/python3.10/site-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=ResNet18_Weights.IMAGENET1K_V1`. You can also use `weights=ResNet18_Weights.DEFAULT` to get the most up-to-date weights.\n  warnings.warn(msg)"
+  },
+  {
+    "objectID": "vision.learner.html",
+    "href": "vision.learner.html",
+    "title": "Vision learner",
+    "section": "",
+    "text": "from fastgs.multispectral import *\nfrom fastgs.test.fixture import *\n\nLoad sample image and mask from text fixture\n\n(elvn_imgs,elvn_mask) = get_11b_test_tuple()\n\n\ndef _show_one(mskovl):\n    rowcx = _get_sample_ctxs(elvn_imgs.num_images(), 1, mskovl)\n    _show_one_result(elvn_imgs, elvn_mask, elvn_mask, rowcx[0], mskovl)\n\n\n_show_one(True)\n\n\n\n\n\n_show_one(False)\n\n\n\n\n\nFastAI methods\nNow we put these low level functions to use in developing the actual functions used by fastai.\n\nfrom fastgs.test.fixture import *\n\n\nlearner = get_11b_test_learner()\nlearner.fit_one_cycle(1)\n\n\nlearner.show_results(mskovl=False)\n\n\n\n\n\n\n\n\n\n\n\n\ninterp = SegmentationInterpretation.from_learner(learner)\ninterp.plot_top_losses(k=1,mskovl=False)\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nPretrained model init\nIf n_in is > 3, the fastai vision models leave the weights for the first 3 channels the same (on the natural assumption that these correspond to true R, G, B channels). The weights of all channels greater than 3 is set to 0.\nAssuming that the first 3 channels of our MS model are actual R, G, B channels, then a reasonable alternative is to initialize weights of all remaining channels to the average of the R,G,B weights.\nIf the first 3 channels do not correspond to actual R,G,B inputs, it may make sense to re-initialize all weights to the average R,G,B weights.\n\n\nConv2d.fastgs_reinit_weights\n\n Conv2d.fastgs_reinit_weights (reweight:str=None)"
+  },
+  {
+    "objectID": "vision.augment.html",
+    "href": "vision.augment.html",
+    "title": "Vision augmentation",
+    "section": "",
+    "text": "We then create an encoder that calls the albumentations transform, converting back and forth from the type/shape expected by albumentations.\nFinally, a function that dynamically constructs the transform class with the specified split_idx (0 for training, 1 for validation, and None for testing)\nLet’s see if this works. First we need to create a class TestMSSAT which will work outside the pipeline.\n\nTestMSSAT = _create_ms_seg_alb_xfm_cls(\"TestMSSAT\", None)\n\nFirst create a transform using a simple albumentations transform\n\nimport albumentations as A\n\n\ntfm = TestMSSAT(A.HorizontalFlip(p=1))\n\nNext we load our sample img / msk tuple using the test fixture function.\n\nfrom fastgs.test.fixture import *\n\n\n(img_org,msk_org) = get_11b_test_tuple()\n\nLet’s perform the transform\n\n(img_tfm,msk_tfm) = tfm((img_org,msk_org))\n\nHere is the original image\n\nimg_org.show()\n\n[<AxesSubplot:title={'center':'B04,B03,B02'}>,\n <AxesSubplot:title={'center':'B07,B06,B05'}>,\n <AxesSubplot:title={'center':'B12,B11,B8A'}>,\n <AxesSubplot:title={'center':'B08'}>]\n\n\n\n\n\nand the transformed image\n\nimg_tfm.show()\n\n[<AxesSubplot:title={'center':'B04,B03,B02'}>,\n <AxesSubplot:title={'center':'B07,B06,B05'}>,\n <AxesSubplot:title={'center':'B12,B11,B8A'}>,\n <AxesSubplot:title={'center':'B08'}>]\n\n\n\n\n\nand the horizontal flip has worked as it is supposed to\nWe check the masks to see that the transform worked as advertised\n\nmsk_org.show()\n\n<AxesSubplot:>\n\n\n\n\n\n\nmsk_tfm.show()\n\n<AxesSubplot:>\n\n\n\n\n\nFinally, we create the classes for training and validation\n\nfrom fastgs.test.fixture import *\nfrom fastgs.vision.data import *\nfrom fastgs.multispectral import *\n\n\nfgs = get_11b_test_fgs(\n    MSAugment(\n        train_aug=A.ShiftScaleRotate(p=1),\n        valid_aug=A.Rotate(p=1)\n    )\n)\ndl = fgs.create_data_block().dataloaders(source=[66]*10,bs=8)\n\n\ndl.train.show_batch(max_n=4,mskovl=False)\n\n\n\n\n\ndl.valid.show_batch(mskovl=False)"
+  },
+  {
+    "objectID": "test.fixture.html",
+    "href": "test.fixture.html",
+    "title": "Test fixture",
+    "section": "",
+    "text": "source\n\nget_11b_test_dl\n\n get_11b_test_dl ()\n\nCreate data loader with sample inputs repeated nlen times\n\nsource\n\n\nget_11b_test_learner\n\n get_11b_test_learner ()\n\nCreate sample FastGS learner for eleven band Sentinel 2 data\n\nsource\n\n\nget_11b_test_fgs\n\n get_11b_test_fgs (augs=<fastgs.multispectral.MSAugment object at\n                   0x7f28ab1cea00>)\n\nCreate sample FastGS wrapper for eleven band Sentinel 2 data\n\nsource\n\n\nget_11b_test_tuple\nCreate sample test tuple for eleven band Sentinel 2 data"
+  },
+  {
+    "objectID": "vision.core.html",
+    "href": "vision.core.html",
+    "title": "Core vision - TensorImageMS",
+    "section": "",
+    "text": "source"
+  },
+  {
+    "objectID": "vision.core.html#multiple-images---one-for-each-set-of-channels",
+    "href": "vision.core.html#multiple-images---one-for-each-set-of-channels",
+    "title": "Core vision - TensorImageMS",
+    "section": "Multiple images - one for each set of channels",
+    "text": "Multiple images - one for each set of channels\nOur approach is to display multiple images for each multi-spectral image. We can either present each channel as a single “monochrome” image, or more compactly, sets of 3 channels as one “false color” image (or as a true color image when we display the actual RGB channels).\nThis is done by providing a tuple of indices corresponding to the required channels. In practice, the tuple will either be of length 3 (false color) or 1 (monochrome). A list of these “channel tuples” is in the bands attribute.\nThe number of images in the visualization can be calculated from the list.\n\nsource\n\nTensorImageMS.num_images\n\n TensorImageMS.num_images ()\n\n\ntest_eq(t.num_images(),0)\n\nEach individual image in the visualization is represented by a “filtered” tensor that represents only the selected band(s). The following method does the selection.\n\nt3 = t._select_bands((1,0,2))\n\ntest_eq(t3,TensorImageMS([[.3, .4],[1., 2.],[5.,6.]]))\ntest_eq(t3.bands,t.bands)\ntest_eq(t3.brgtX,t.brgtX)\n\nt1 = t._select_bands((1,))\ntest_eq(t1,TensorImageMS([[.3, .4]]))"
+  },
+  {
+    "objectID": "vision.core.html#image-brightening",
+    "href": "vision.core.html#image-brightening",
+    "title": "Core vision - TensorImageMS",
+    "section": "Image Brightening",
+    "text": "Image Brightening\nAnother practical problem that needs to be addressed when dealing with normalized Sentinel 2 images is that typical pixel values are very “dark” when rendered graphically.\nIt is helpful to artificially brighten normalized tensors, using multipliers (that can vary according to the band). These multipliers lists are referenced by the brgtX attribute of our class.\nTest calculation\n\nt1b2 = t1._brighten([2.])\ntest_eq(t1b2, TensorImageMS([[0.6, 0.8]]))\n\nUse a multiplier of 1.0 when brightening is not called for.\n\nt1b1 = t1._brighten([1.])\ntest_eq(t1b1, t1)"
+  },
+  {
+    "objectID": "vision.core.html#display-on-grid",
+    "href": "vision.core.html#display-on-grid",
+    "title": "Core vision - TensorImageMS",
+    "section": "Display on grid",
+    "text": "Display on grid\nThe brightened images are then displayed in the contexts that represent a matplotlib grid of images.\nThe grid consists of rows, one for each MS image. Each row consists of all the individual images (one per column) corresponding to channel sets.\nThis is all put together to display the final image(s).\n\nsource\n\nTensorImageMS.show\n\n TensorImageMS.show (ctxs=None, **kwargs)"
+  },
+  {
+    "objectID": "vision.core.html#example",
+    "href": "vision.core.html#example",
+    "title": "Core vision - TensorImageMS",
+    "section": "Example",
+    "text": "Example\nWe use the MS file io functionality defined here to load a multi spectral image tensor.\n\ndef get_input(stem: str) -> str:\n    \"Get full input path for stem\"\n    return \"./images/\" + stem\n\ndef tile_img_name(chn_id: str, tile_num: int) -> str:\n    \"File name from channel id and tile number\"\n    return f\"Sentinel20m-{chn_id}-20200215-{tile_num:03d}.png\"\n\ndef get_channel_filenames(chn_ids, tile_idx):\n    \"Get list of all channel filenames for one tile idx\"\n    return [get_input(tile_img_name(x, tile_idx)) for x in chn_ids]\n\n\nfrom fastgs.test.io import *\n\n\ndef load_tensor(tile_num: int):\n    bands=[(2,1,0),(3,),(1,),(0,)]\n    captions=[\"B04,B03,B02\",\"B8A\",\"B03\",\"B02\"]\n    brgtX=[[3.75,4.25,4.75],[2.5],[4.25],[4.75]]\n    files=get_channel_filenames([\"B02\",\"B03\",\"B04\",\"B8A\"],tile_num)\n    t=read_multichan_files(files)\n    return TensorImageMS.from_tensor(t,bands=bands,captions=captions,brgtX=brgtX)\n\nThe tensor is loading channels with ids “B02” (Blue - B), “B03” (Green - G), “B04” (Red - R) and “B8A” (Near Infra Red - NIR) into channel indices 0, 1, 2 and 3.\nThe bands represent channels sets with indices (2,1,0) i.e. (R, G, B) and (3) i.e. (NIR) and (1) i.e. (G) and (2) i.e. (B). The first set is shown as an RGB image with R,G and B actually corresponding to the “real” Red, Green, and Blue channels. If other channels had been selected, it would be a “false colour” image.\nThe brgtX represents a brightness multiplier to multiply the values in each channel so that the result is not visually dark.\nWhen the image is displayed, it actually produces a sequence of 4 images, a colour image corresponding to RGB, and 3 monochrome images, each corresponding to NIR, G and B respectively.\n\nmsimg=load_tensor(66)\nmsimg.show()\n\n[<AxesSubplot:title={'center':'B04,B03,B02'}>,\n <AxesSubplot:title={'center':'B8A'}>,\n <AxesSubplot:title={'center':'B03'}>,\n <AxesSubplot:title={'center':'B02'}>]"
+  },
+  {
+    "objectID": "vision.core.html#animating-multiple-images",
+    "href": "vision.core.html#animating-multiple-images",
+    "title": "Core vision - TensorImageMS",
+    "section": "Animating multiple images",
+    "text": "Animating multiple images\nAnother possibility for display of the individual images of channel tuples is to create an animation that cycles through the images, rather than laying them out as a row of images.\nNote that this animation has a runtime dependency on ffmpeg which is not listed in the package dependency. You will need to install it manually for the animation to function.\n\nmsimg._show_animation()\n\n\n  \n  Your browser does not support the video tag.\n\n\n\nThis reduces the amount of visual space taken up by the image, and also makes it easier to see how an individual pixel/area changes “color” as the channel set changes.\nHowever, since this creates an embedded HTML movie, it results in a large increase in the cell output size. It might be interesting if we could produce in-place “.gif” files instead."
+  },
+  {
+    "objectID": "vision.load.html",
+    "href": "vision.load.html",
+    "title": "Tensor loading helpers",
+    "section": "",
+    "text": "source"
+  },
+  {
+    "objectID": "vision.load.html#mask-loading-helpers",
+    "href": "vision.load.html#mask-loading-helpers",
+    "title": "Tensor loading helpers",
+    "section": "Mask loading helpers",
+    "text": "Mask loading helpers\nIn a similar fashion we create helpers for Mask loading\n\nsource\n\nMSMaskGetter.load_mask\n\n MSMaskGetter.load_mask (band_ids:list[str], img_id:Any)\n\n\nsource\n\n\nMSMaskGetter\n\n MSMaskGetter ()\n\nInitialize self. See help(type(self)) for accurate signature.\n\nsource\n\n\n_MSFileMaskGetter.load_mask\n\n _MSFileMaskGetter.load_mask (mask_id:str, img_id:Any)\n\n\nsource\n\n\n_MSDelegatingMaskGetter.load_mask\n\n _MSDelegatingMaskGetter.load_mask (mask_id:str, img_id:Any)\n\n\nsource\n\n\nMSMaskGetter.from_delegate\n\n MSMaskGetter.from_delegate\n                             (tg_fn:Callable[[str,Any],fastai.torch_core.T\n                             ensorMask])\n\n\nsource\n\n\nMSMaskGetter.from_files\n\n MSMaskGetter.from_files\n                          (files_getter:Callable[[list[str],Any],list[str]\n                          ], chan_io_fn:Callable[[list[str]],fastai.torch_\n                          core.TensorMask])"
+  }
+]

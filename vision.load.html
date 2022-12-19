@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.280">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>fastgs - Tensor loading helpers</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="styles.css">
+<meta property="og:title" content="fastgs - Tensor loading helpers">
+<meta property="og:description" content="source">
+<meta property="og:site-name" content="fastgs">
+<meta name="twitter:title" content="fastgs - Tensor loading helpers">
+<meta name="twitter:description" content="source">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">fastgs</span>
+    </a>
+  </div>
+          <div id="quarto-search" class="" title="Search"></div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">Tensor loading helpers</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">Welcome to fastgs</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./multispectral.html" class="sidebar-item-text sidebar-link">High level wrappers</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./vision.core.html" class="sidebar-item-text sidebar-link">Core vision - <code>TensorImageMS</code></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#mstensorgetter.load_tensor" id="toc-mstensorgetter.load_tensor" class="nav-link active" data-scroll-target="#mstensorgetter.load_tensor">MSTensorGetter.load_tensor</a></li>
+  <li><a href="#mstensorgetter" id="toc-mstensorgetter" class="nav-link" data-scroll-target="#mstensorgetter">MSTensorGetter</a></li>
+  <li><a href="#msfiletensorgetter.load_tensor" id="toc-msfiletensorgetter.load_tensor" class="nav-link" data-scroll-target="#msfiletensorgetter.load_tensor">_MSFileTensorGetter.load_tensor</a></li>
+  <li><a href="#msdelegatingtensorgetter.load_tensor" id="toc-msdelegatingtensorgetter.load_tensor" class="nav-link" data-scroll-target="#msdelegatingtensorgetter.load_tensor">_MSDelegatingTensorGetter.load_tensor</a></li>
+  <li><a href="#mstensorgetter.from_delegate" id="toc-mstensorgetter.from_delegate" class="nav-link" data-scroll-target="#mstensorgetter.from_delegate">MSTensorGetter.from_delegate</a></li>
+  <li><a href="#mstensorgetter.from_files" id="toc-mstensorgetter.from_files" class="nav-link" data-scroll-target="#mstensorgetter.from_files">MSTensorGetter.from_files</a></li>
+  <li><a href="#mask-loading-helpers" id="toc-mask-loading-helpers" class="nav-link" data-scroll-target="#mask-loading-helpers">Mask loading helpers</a>
+  <ul class="collapse">
+  <li><a href="#msmaskgetter.load_mask" id="toc-msmaskgetter.load_mask" class="nav-link" data-scroll-target="#msmaskgetter.load_mask">MSMaskGetter.load_mask</a></li>
+  <li><a href="#msmaskgetter" id="toc-msmaskgetter" class="nav-link" data-scroll-target="#msmaskgetter">MSMaskGetter</a></li>
+  <li><a href="#msfilemaskgetter.load_mask" id="toc-msfilemaskgetter.load_mask" class="nav-link" data-scroll-target="#msfilemaskgetter.load_mask">_MSFileMaskGetter.load_mask</a></li>
+  <li><a href="#msdelegatingmaskgetter.load_mask" id="toc-msdelegatingmaskgetter.load_mask" class="nav-link" data-scroll-target="#msdelegatingmaskgetter.load_mask">_MSDelegatingMaskGetter.load_mask</a></li>
+  <li><a href="#msmaskgetter.from_delegate" id="toc-msmaskgetter.from_delegate" class="nav-link" data-scroll-target="#msmaskgetter.from_delegate">MSMaskGetter.from_delegate</a></li>
+  <li><a href="#msmaskgetter.from_files" id="toc-msmaskgetter.from_files" class="nav-link" data-scroll-target="#msmaskgetter.from_files">MSMaskGetter.from_files</a></li>
+  </ul></li>
+  </ul>
+<div class="toc-actions"><div><i class="bi bi-github"></i></div><div class="action-links"><p><a href="https://github.com/restlessronin/fastgs/issues/new" class="toc-action">Report an issue</a></p></div></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title d-none d-lg-block">Tensor loading helpers</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<hr>
+<p><a href="https://github.com/restlessronin/fastgs/blob/main/fastgs/vision/load.py#L19" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="mstensorgetter.load_tensor" class="level3">
+<h3 class="anchored" data-anchor-id="mstensorgetter.load_tensor">MSTensorGetter.load_tensor</h3>
+<blockquote class="blockquote">
+<pre><code> MSTensorGetter.load_tensor (band_ids:list[str], img_id:Any)</code></pre>
+</blockquote>
+<hr>
+<p><a href="https://github.com/restlessronin/fastgs/blob/main/fastgs/vision/load.py#L15" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="mstensorgetter" class="level3">
+<h3 class="anchored" data-anchor-id="mstensorgetter">MSTensorGetter</h3>
+<blockquote class="blockquote">
+<pre><code> MSTensorGetter ()</code></pre>
+</blockquote>
+<p>Initialize self. See help(type(self)) for accurate signature.</p>
+<p>The common case is specified with 2 functions, one which returns a list of files for the specified channels, and another that loads a <a href="https://restlessronin.github.io/fastgs/vision.core.html#tensorimagems"><code>TensorImageMS</code></a> given that list of files.</p>
+<hr>
+<p><a href="https://github.com/restlessronin/fastgs/blob/main/fastgs/vision/load.py#L35" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="msfiletensorgetter.load_tensor" class="level3">
+<h3 class="anchored" data-anchor-id="msfiletensorgetter.load_tensor">_MSFileTensorGetter.load_tensor</h3>
+<blockquote class="blockquote">
+<pre><code> _MSFileTensorGetter.load_tensor (band_ids:list[str], img_id:Any)</code></pre>
+</blockquote>
+<p>For unusual cases, we supply a function that does the complete tensor loading</p>
+<hr>
+<p><a href="https://github.com/restlessronin/fastgs/blob/main/fastgs/vision/load.py#L51" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="msdelegatingtensorgetter.load_tensor" class="level3">
+<h3 class="anchored" data-anchor-id="msdelegatingtensorgetter.load_tensor">_MSDelegatingTensorGetter.load_tensor</h3>
+<blockquote class="blockquote">
+<pre><code> _MSDelegatingTensorGetter.load_tensor (band_ids:list[str], img_id:Any)</code></pre>
+</blockquote>
+<p>Finally we provide factories</p>
+<hr>
+<p><a href="https://github.com/restlessronin/fastgs/blob/main/fastgs/vision/load.py#L64" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="mstensorgetter.from_delegate" class="level3">
+<h3 class="anchored" data-anchor-id="mstensorgetter.from_delegate">MSTensorGetter.from_delegate</h3>
+<blockquote class="blockquote">
+<pre><code> MSTensorGetter.from_delegate
+                               (tg_fn:Callable[[list[str],Any],fastgs.visi
+                               on.core.TensorImageMS])</code></pre>
+</blockquote>
+<hr>
+<p><a href="https://github.com/restlessronin/fastgs/blob/main/fastgs/vision/load.py#L56" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="mstensorgetter.from_files" class="level3">
+<h3 class="anchored" data-anchor-id="mstensorgetter.from_files">MSTensorGetter.from_files</h3>
+<blockquote class="blockquote">
+<pre><code> MSTensorGetter.from_files
+                            (files_getter:Callable[[list[str],Any],list[st
+                            r]], chan_io_fn:Callable[[list[str]],fastgs.vi
+                            sion.core.TensorImageMS])</code></pre>
+</blockquote>
+</section>
+<section id="mask-loading-helpers" class="level2">
+<h2 class="anchored" data-anchor-id="mask-loading-helpers">Mask loading helpers</h2>
+<p>In a similar fashion we create helpers for Mask loading</p>
+<hr>
+<p><a href="https://github.com/restlessronin/fastgs/blob/main/fastgs/vision/load.py#L75" target="_blank" style="float:right; font-size:smaller">source</a></p>
+<section id="msmaskgetter.load_mask" class="level3">
+<h3 class="anchored" data-anchor-id="msmaskgetter.load_mask">MSMaskGetter.load_mask</h3>
+<blockquote class="blockquote">
+<pre><code> MSMaskGetter.load_mask (band_ids:list[str], img_id:Any)</code></pre>
+</blockquote>
+<hr>
+<p><a href="https://github.com/restlessronin/fastgs/blob/main/fastgs/vision/load.py#L71" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="msmaskgetter" class="level3">
+<h3 class="anchored" data-anchor-id="msmaskgetter">MSMaskGetter</h3>
+<blockquote class="blockquote">
+<pre><code> MSMaskGetter ()</code></pre>
+</blockquote>
+<p>Initialize self. See help(type(self)) for accurate signature.</p>
+<hr>
+<p><a href="https://github.com/restlessronin/fastgs/blob/main/fastgs/vision/load.py#L91" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="msfilemaskgetter.load_mask" class="level3">
+<h3 class="anchored" data-anchor-id="msfilemaskgetter.load_mask">_MSFileMaskGetter.load_mask</h3>
+<blockquote class="blockquote">
+<pre><code> _MSFileMaskGetter.load_mask (mask_id:str, img_id:Any)</code></pre>
+</blockquote>
+<hr>
+<p><a href="https://github.com/restlessronin/fastgs/blob/main/fastgs/vision/load.py#L107" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="msdelegatingmaskgetter.load_mask" class="level3">
+<h3 class="anchored" data-anchor-id="msdelegatingmaskgetter.load_mask">_MSDelegatingMaskGetter.load_mask</h3>
+<blockquote class="blockquote">
+<pre><code> _MSDelegatingMaskGetter.load_mask (mask_id:str, img_id:Any)</code></pre>
+</blockquote>
+<hr>
+<p><a href="https://github.com/restlessronin/fastgs/blob/main/fastgs/vision/load.py#L120" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="msmaskgetter.from_delegate" class="level3">
+<h3 class="anchored" data-anchor-id="msmaskgetter.from_delegate">MSMaskGetter.from_delegate</h3>
+<blockquote class="blockquote">
+<pre><code> MSMaskGetter.from_delegate
+                             (tg_fn:Callable[[str,Any],fastai.torch_core.T
+                             ensorMask])</code></pre>
+</blockquote>
+<hr>
+<p><a href="https://github.com/restlessronin/fastgs/blob/main/fastgs/vision/load.py#L112" target="_blank" style="float:right; font-size:smaller">source</a></p>
+</section>
+<section id="msmaskgetter.from_files" class="level3">
+<h3 class="anchored" data-anchor-id="msmaskgetter.from_files">MSMaskGetter.from_files</h3>
+<blockquote class="blockquote">
+<pre><code> MSMaskGetter.from_files
+                          (files_getter:Callable[[list[str],Any],list[str]
+                          ], chan_io_fn:Callable[[list[str]],fastai.torch_
+                          core.TensorMask])</code></pre>
+</blockquote>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
