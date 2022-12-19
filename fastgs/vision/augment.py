@@ -18,7 +18,7 @@ def _ms_seg_alb_xfm_encodes(self, x):
     img,msk = x
     res = self.aug(image=img.permute(1,2,0).numpy(),mask=msk.numpy())
     return (
-        TensorImageMS.from_tensor(torch.from_numpy(res["image"]).permute(2,0,1),bands=img.bands,brgtX=img.brgtX),
+        TensorImageMS.from_tensor(torch.from_numpy(res["image"]).permute(2,0,1),bands=img.bands,captions=img.captions,brgtX=img.brgtX),
         TensorMask(torch.from_numpy(res["mask"]))
     )
 
