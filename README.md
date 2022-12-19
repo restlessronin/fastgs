@@ -206,11 +206,13 @@ from fastgs.vision.augment import *
 dl.train.show_batch(max_n=3,mskovl=False) # don't overlay mask
 ```
 
-    TypeError: TensorImageMS.from_tensor() missing 1 required positional argument: 'captions'
+![](index_files/figure-commonmark/cell-11-output-1.png)
 
 ``` python
 dl.valid.show_batch(mskovl=False)
 ```
+
+![](index_files/figure-commonmark/cell-12-output-1.png)
 
 We create and train a unet learner and look at results. Image is in
 first 4 columns, mask in the 5th and prediction in the 6th.
@@ -221,12 +223,42 @@ learner.fit_one_cycle(1)
 learner.show_results(mskovl=False)
 ```
 
+    /opt/homebrew/Caskroom/miniforge/base/envs/fastgs/lib/python3.10/site-packages/torchvision/models/_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
+      warnings.warn(
+    /opt/homebrew/Caskroom/miniforge/base/envs/fastgs/lib/python3.10/site-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=ResNet18_Weights.IMAGENET1K_V1`. You can also use `weights=ResNet18_Weights.DEFAULT` to get the most up-to-date weights.
+      warnings.warn(msg)
+
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: left;">
+      <th>epoch</th>
+      <th>train_loss</th>
+      <th>valid_loss</th>
+      <th>dice</th>
+      <th>time</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>0.860428</td>
+      <td>0.642802</td>
+      <td>0.032248</td>
+      <td>00:22</td>
+    </tr>
+  </tbody>
+</table>
+
+![](index_files/figure-commonmark/cell-13-output-6.png)
+
 Finally, we can look at the top losses
 
 ``` python
 interp = SegmentationInterpretation.from_learner(learner)
 interp.plot_top_losses(k=1,mskovl=False)
 ```
+
+![](index_files/figure-commonmark/cell-14-output-5.png)
 
 ## Acknowledgements
 
