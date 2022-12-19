@@ -25,18 +25,20 @@ class TensorImageMS(TensorImage):
 def from_tensor(
     cls:TensorImageMS,
     x, # tensor of channels
-    bands: list(tuple(int)), # list of index position tuples, each tuple is 3 ordered channel indices or a single channel index
-    brgtX: list(list(float)) # list of brightness multiplier lists, each list has a multiplier for each element of the corresponding channel tuple
+    bands:list(tuple(int)), # list of index position tuples, each tuple is 3 ordered channel indices or a single channel index
+    captions:list(str), # list of captions for each set of bands
+    brgtX:list(list(float)), # list of brightness multiplier lists, each list has a multiplier for each element of the corresponding channel tuple
 ):
-    return cls(x, bands=bands, brgtX=brgtX)
+    return cls(x, bands=bands, captions=captions, brgtX=brgtX)
 
 @patch(cls_method=True)
 def from_tensor_bands(
-    cls: TensorImageMS,
+    cls:TensorImageMS,
     x, # tensor of channels
-    bands: list(tuple(int)) # list of index position tuples, each tuple is 3 ordered channels or a single channel
+    bands:list(tuple(int)), # list of index position tuples, each tuple is 3 ordered channels or a single channel
+    captions:list(str) # list of captions for each set of bands
 ):
-    return cls.from_tensor(x, bands=bands, brgtX=[[1] * len(i) for i in bands])
+    return cls.from_tensor(x, bands=bands, captions=captions, brgtX=[[1] * len(i) for i in bands])
 
 # %% ../../nbs/07a_vision.core.ipynb 11
 @patch
@@ -46,7 +48,7 @@ def num_images(self: TensorImageMS) -> int:
 # %% ../../nbs/07a_vision.core.ipynb 14
 @patch
 def _select_bands(self: TensorImageMS, bands: tuple[int]) -> TensorImageMS:
-    assert len(bands) <= 3
+    assert len(bands) == 3 or len(bands) == 1
     return torch.index_select(self, 0, torch.IntTensor(bands))
 
 # %% ../../nbs/07a_vision.core.ipynb 17
@@ -61,8 +63,8 @@ def _brighten(self: TensorImageMS, brgtX: list[float]) -> TensorImageMS:
 @patch
 def _show_tiles(self: TensorImageMS, ctxs: list, **kwargs) -> list:
     assert ctxs is not None
-    ims: TensorImageMS = [self._select_bands(b)._brighten(m) for b, m in zip(self.bands, self.brgtX)]
-    return [show_image(im, ax=ax) for im, ax in zip(ims, ctxs)]
+    ims = [self._select_bands(b)._brighten(m) for b, m in zip(self.bands, self.brgtX)]
+    return [show_image(im, ax=ax, title=t) for im, t, ax in zip(ims, self.captions, ctxs)]
 
 # %% ../../nbs/07a_vision.core.ipynb 25
 @patch

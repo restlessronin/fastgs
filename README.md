@@ -18,9 +18,16 @@ imaging.
 
 Complete examples are provided in the following notebooks
 
-1.  working with the kaggle [38-cloud/95-cloud landsat
+1.  working with a netCDF sample
+    [KappaSet](https://www.kaggle.com/code/restlessronin/netcdf-demo-fastai-using-fastgs).
+    demo code for brightness factor calculation by
+    [@wrignj08](https://github.com/wrignj08). Shows how to load images
+    with all channels stored in a single netCDF file.
+2.  working with the kaggle [38-cloud/95-cloud landsat
     dataset](https://www.kaggle.com/code/restlessronin/cloud95-fastai-with-fastgs-multispectral-support).
-2.  working on a segmentation problem with a [Sentinel 2
+    Shows how to load images stored in a “single channel per file”
+    format (seems to be the common case).
+3.  working on a segmentation problem with a [Sentinel 2
     dataset](https://www.kaggle.com/code/restlessronin/lila-sentinel-2-segmentation-with-fastai)
 
 These are boths works in progress and optimized to display the features
@@ -124,9 +131,12 @@ img12 = snt12_imgs.load_image(66)
 img12.show()
 ```
 
-    [<AxesSubplot:>, <AxesSubplot:>, <AxesSubplot:>, <AxesSubplot:>]
+    [<AxesSubplot:title={'center':'B04,B03,B02'}>,
+     <AxesSubplot:title={'center':'B07,B06,B05'}>,
+     <AxesSubplot:title={'center':'B12,B11,B8A'}>,
+     <AxesSubplot:title={'center':'B08'}>]
 
-![](index_files/figure-gfm/cell-4-output-2.png)
+![](index_files/figure-commonmark/cell-4-output-2.png)
 
 Note that the single MS image is displayed as 4 images, each
 corresponding to one of the channel lists we provided. The first image
@@ -196,13 +206,11 @@ from fastgs.vision.augment import *
 dl.train.show_batch(max_n=3,mskovl=False) # don't overlay mask
 ```
 
-![](index_files/figure-gfm/cell-11-output-1.png)
+    TypeError: TensorImageMS.from_tensor() missing 1 required positional argument: 'captions'
 
 ``` python
 dl.valid.show_batch(mskovl=False)
 ```
-
-![](index_files/figure-gfm/cell-12-output-1.png)
 
 We create and train a unet learner and look at results. Image is in
 first 4 columns, mask in the 5th and prediction in the 6th.
@@ -213,42 +221,12 @@ learner.fit_one_cycle(1)
 learner.show_results(mskovl=False)
 ```
 
-    /opt/homebrew/Caskroom/miniforge/base/envs/fastgs/lib/python3.10/site-packages/torchvision/models/_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
-      warnings.warn(
-    /opt/homebrew/Caskroom/miniforge/base/envs/fastgs/lib/python3.10/site-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=ResNet18_Weights.IMAGENET1K_V1`. You can also use `weights=ResNet18_Weights.DEFAULT` to get the most up-to-date weights.
-      warnings.warn(msg)
-
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: left;">
-      <th>epoch</th>
-      <th>train_loss</th>
-      <th>valid_loss</th>
-      <th>dice</th>
-      <th>time</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>0</td>
-      <td>0.858259</td>
-      <td>0.631103</td>
-      <td>0.036843</td>
-      <td>00:25</td>
-    </tr>
-  </tbody>
-</table>
-
-![](index_files/figure-gfm/cell-13-output-6.png)
-
 Finally, we can look at the top losses
 
 ``` python
 interp = SegmentationInterpretation.from_learner(learner)
 interp.plot_top_losses(k=1,mskovl=False)
 ```
-
-![](index_files/figure-gfm/cell-14-output-5.png)
 
 ## Acknowledgements
 
