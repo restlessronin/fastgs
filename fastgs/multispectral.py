@@ -247,10 +247,28 @@ class FastGS:
 
 # %% ../nbs/62_multispectral.ipynb 74
 @patch
-def __init__(self: FastGS, ms_data: MSData, mask_data: MaskData, ms_aug: MSAugment=MSAugment()):
+def __init__(self: FastGS, ms_data:MSData, mask_data:MaskData, ms_aug:MSAugment, n_out:int):
     store_attr()
 
-# %% ../nbs/62_multispectral.ipynb 76
+# %% ../nbs/62_multispectral.ipynb 75
+@patch(cls_method=True)
+def for_training(
+    cls:FastGS,
+    ms_data:MSData,
+    mask_data:MaskData,
+    ms_aug:MSAugment=MSAugment()
+):
+    return cls(ms_data,mask_data,ms_aug,len(mask_data.mask_codes))
+
+@patch(cls_method=True)
+def for_inference(
+    cls:FastGS,
+    ms_data:MSData,
+    n_out:int
+):
+    return cls(ms_data,None,None,n_out)
+
+# %% ../nbs/62_multispectral.ipynb 77
 @patch
 def create_data_block(self: FastGS, splitter=RandomSplitter(valid_pct=0.2, seed=107)) -> DataBlock:
     return DataBlock(
@@ -259,13 +277,20 @@ def create_data_block(self: FastGS, splitter=RandomSplitter(valid_pct=0.2, seed=
         item_tfms=self.ms_aug.create_item_xforms()
     )
 
-# %% ../nbs/62_multispectral.ipynb 78
+# %% ../nbs/62_multispectral.ipynb 79
 @patch
-def create_unet_learner(self: FastGS,dl,model,pretrained=True,loss_func=CrossEntropyLossFlat(axis=1),metrics=Dice(axis=1),reweight="avg") -> Learner:
+def create_unet_learner(self:FastGS,dl,model,pretrained=True,loss_func=CrossEntropyLossFlat(axis=1),metrics=Dice(axis=1),reweight="avg") -> Learner:
     learner = unet_learner(
-        dl,model,n_in=len(self.ms_data.bands.ids),n_out=len(self.mask_data.mask_codes),
+        dl,model,n_in=len(self.ms_data.bands.ids),n_out=self.n_out,
         pretrained=pretrained,loss_func=loss_func,metrics=metrics
     )
     if pretrained:
         learner.model[0][0].fastgs_reinit_weights(reweight=reweight)
+    return learner
+
+@patch
+def load_unet_learner(self:FastGS,dl,model,model_path) -> Learner:
+    n_in = len(self.ms_data.bands.ids)
+    learner = unet_learner(dl,model,n_in=n_in,n_out=self.n_out,pretrained=False)
+    learner.load(model_path)
     return learner
