@@ -136,7 +136,7 @@ def from_files(
     return cls(ms_descriptor,BandInputs.from_ids(band_ids),chn_grp_ids,tensor_getter)
 
 @patch(cls_method=True)
-def from_delegate(
+def from_loader(
     cls: MSData,
     ms_descriptor: MSDescriptor,
     band_ids: list[str],
@@ -201,7 +201,7 @@ def from_files(
     return cls(mask_id,mask_getter,mask_codes)
 
 @patch(cls_method=True)
-def from_delegate(
+def from_loader(
     cls: MaskData,
     mask_id: str,
     tg_fn: Callable[[list[str], Any], Tensor],
