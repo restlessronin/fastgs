@@ -29,15 +29,34 @@ def _show_one_sample(img: TensorImageMS, msk: TensorMask, row, mskovl: bool, **k
 # %% ../../nbs/08a_vision.data.ipynb 17
 @typedispatch
 def show_batch(
-    x: TensorImageMS,  # Input(s) in the batch
-    y: TensorMask,  # Target(s) in the batch
+    x:TensorImageMS,
+    y:type(None),
+    samples,
+    ctxs=None,
+    max_n:int=9,
+    nrows:int=None,
+    ncols:int=None,
+    figsize=None,
+    **kwargs
+):
+    assert len(samples[0]) == 1 and not hasattr(samples[0], "show")
+    assert nrows is None and ncols is None and ctxs is None
+
+    rwcx = _get_sample_ctxs(x.num_images(), min(len(samples),max_n), True, figsize)
+    return [img.show(ctxs=row,**kwargs) for img, row in zip(samples.itemgot(0), rwcx)]
+
+# %% ../../nbs/08a_vision.data.ipynb 18
+@typedispatch
+def show_batch(
+    x:TensorImageMS,  # Input(s) in the batch
+    y:TensorMask,  # Target(s) in the batch
     samples: list,  # List of (`x`, `y`) pairs of length `max_n`
     ctxs=None,  # List of `ctx` objects to show data. Could be a matplotlib axis, DataFrame, etc.
-    max_n: int=9,  # Maximum number of `samples` to show
-    nrows: int=None,
-    ncols: int=None,
+    max_n:int=9,  # Maximum number of `samples` to show
+    nrows:int=None,
+    ncols:int=None,
     figsize=None,
-    mskovl: bool=True, # mask is overlaid on the image
+    mskovl:bool=True, # mask is overlaid on the image
     **kwargs
 ):
     assert len(samples[0]) == 2 and not hasattr(samples[0], "show")

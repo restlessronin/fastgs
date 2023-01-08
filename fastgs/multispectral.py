@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 # %% auto 0
-__all__ = ['BandInputs', 'MSDescriptor', 'createSentinel2Descriptor', 'MSData', 'MaskData', 'MSAugment', 'FastGS']
+__all__ = ['BandInputs', 'MSDescriptor', 'createSentinel2Descriptor', 'MSData', 'MaskData', 'MSAugment', 'GSUnetModel', 'FastGS']
 
 # %% ../nbs/62_multispectral.ipynb 3
 from typing import Callable
@@ -136,7 +136,7 @@ def from_files(
     return cls(ms_descriptor,BandInputs.from_ids(band_ids),chn_grp_ids,tensor_getter)
 
 @patch(cls_method=True)
-def from_delegate(
+def from_loader(
     cls: MSData,
     ms_descriptor: MSDescriptor,
     band_ids: list[str],
@@ -201,7 +201,7 @@ def from_files(
     return cls(mask_id,mask_getter,mask_codes)
 
 @patch(cls_method=True)
-def from_delegate(
+def from_loader(
     cls: MaskData,
     mask_id: str,
     tg_fn: Callable[[list[str], Any], Tensor],
@@ -242,15 +242,67 @@ def create_item_xforms(self: MSAugment) -> list(ItemTransform):
     else: return [TrainMSSAT(self.train_aug),ValidMSSAT(self.valid_aug)]
 
 # %% ../nbs/62_multispectral.ipynb 73
+class GSUnetModel:
+    pass
+
+@patch(cls_method=True)
+def from_all(
+    cls:GSUnetModel,
+    model,
+    ms_data:MSData,
+    mask_codes:[str],
+    loss_func=CrossEntropyLossFlat(axis=1),
+    metrics=Dice(axis=1)
+):
+    return cls(model,len(ms_data.bands.ids),len(mask_codes),loss_func,metrics)
+
+@patch
+def __init__(self: GSUnetModel, model, n_in, n_out, loss_func, metrics):
+    store_attr()
+
+@patch
+def create_learner(self:GSUnetModel,dl,pretrained=False,**kwargs):
+    learner = unet_learner(dl,self.model,n_in=self.n_in,n_out=self.n_out,pretrained=pretrained,loss_func=self.loss_func,metrics=self.metrics)
+    if pretrained:
+        learner.model[0][0].fastgs_reinit_weights(reweight=reweight)
+    return learner
+
+@patch
+def load_learner(self:GSUnetModel,model_path:str,dl):
+    learner = unet_learner(dl,self.model,n_in=self.n_in,n_out=self.n_out,pretrained=False,loss_func=self.loss_func,metrics=self.metrics)
+    learner.load(model_path)
+    return learner
+
+# %% ../nbs/62_multispectral.ipynb 75
 class FastGS:
     pass
 
-# %% ../nbs/62_multispectral.ipynb 74
+# %% ../nbs/62_multispectral.ipynb 76
 @patch
-def __init__(self: FastGS, ms_data: MSData, mask_data: MaskData, ms_aug: MSAugment=MSAugment()):
+def __init__(self:FastGS, model:GSUnetModel, ms_data:MSData, mask_data:MaskData, ms_aug:MSAugment):
     store_attr()
 
-# %% ../nbs/62_multispectral.ipynb 76
+# %% ../nbs/62_multispectral.ipynb 77
+@patch(cls_method=True)
+def for_training(
+    cls:FastGS,
+    ms_data:MSData,
+    mask_data:MaskData,
+    ms_aug:MSAugment=MSAugment()
+):
+    model = GSUnetModel.from_all(resnet18,ms_data,mask_data.mask_codes)
+    return cls(model,ms_data,mask_data,ms_aug)
+
+@patch(cls_method=True)
+def for_inference(
+    cls:FastGS,
+    ms_data:MSData,
+    mask_codes:[str]
+):
+    model = GSUnetModel.from_all(resnet18,ms_data,mask_codes)
+    return cls(model,ms_data,None,None)
+
+# %% ../nbs/62_multispectral.ipynb 79
 @patch
 def create_data_block(self: FastGS, splitter=RandomSplitter(valid_pct=0.2, seed=107)) -> DataBlock:
     return DataBlock(
@@ -259,13 +311,11 @@ def create_data_block(self: FastGS, splitter=RandomSplitter(valid_pct=0.2, seed=
         item_tfms=self.ms_aug.create_item_xforms()
     )
 
-# %% ../nbs/62_multispectral.ipynb 78
+# %% ../nbs/62_multispectral.ipynb 81
 @patch
-def create_unet_learner(self: FastGS,dl,model,pretrained=True,loss_func=CrossEntropyLossFlat(axis=1),metrics=Dice(axis=1),reweight="avg") -> Learner:
-    learner = unet_learner(
-        dl,model,n_in=len(self.ms_data.bands.ids),n_out=len(self.mask_data.mask_codes),
-        pretrained=pretrained,loss_func=loss_func,metrics=metrics
-    )
-    if pretrained:
-        learner.model[0][0].fastgs_reinit_weights(reweight=reweight)
-    return learner
+def create_learner(self:FastGS,dl,reweight="avg") -> Learner:
+    return self.model.create_learner(dl,pretrained=reweight is None,reweight=reweight)
+
+@patch
+def load_learner(self:FastGS,model_path,dl) -> Learner:
+    return self.model.load_learner(model_path,dl)

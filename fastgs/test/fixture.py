@@ -42,7 +42,7 @@ def get_11b_test_tuple() -> tuple(TensorImageMS, TensorMask):
 
 def get_11b_test_fgs(augs=_get_augs()):
     "Create sample FastGS wrapper for eleven band Sentinel 2 data"
-    return FastGS(_get_11b_msdata(),_get_mask_data(),augs)
+    return FastGS.for_training(_get_11b_msdata(),_get_mask_data(),augs)
 
 def get_11b_test_learner():
     "Create sample FastGS learner for eleven band Sentinel 2 data"

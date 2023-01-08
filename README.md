@@ -181,7 +181,7 @@ augs = MSAugment(train_aug=A.Rotate(p=1),valid_aug=A.HorizontalFlip(p=0.33))
 Now we create the actual high level wrapper
 
 ``` python
-fastgs = FastGS(snt12_imgs,msks,augs)
+fastgs = FastGS.for_training(snt12_imgs,msks,augs)
 ```
 
 Create a datablock and a data loader
@@ -223,11 +223,6 @@ learner.fit_one_cycle(1)
 learner.show_results(mskovl=False)
 ```
 
-    /opt/homebrew/Caskroom/miniforge/base/envs/fastgs/lib/python3.10/site-packages/torchvision/models/_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
-      warnings.warn(
-    /opt/homebrew/Caskroom/miniforge/base/envs/fastgs/lib/python3.10/site-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=ResNet18_Weights.IMAGENET1K_V1`. You can also use `weights=ResNet18_Weights.DEFAULT` to get the most up-to-date weights.
-      warnings.warn(msg)
-
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: left;">
@@ -241,15 +236,15 @@ learner.show_results(mskovl=False)
   <tbody>
     <tr>
       <td>0</td>
-      <td>0.860428</td>
-      <td>0.642802</td>
-      <td>0.032248</td>
-      <td>00:22</td>
+      <td>0.812173</td>
+      <td>0.515000</td>
+      <td>0.005123</td>
+      <td>00:25</td>
     </tr>
   </tbody>
 </table>
 
-![](index_files/figure-commonmark/cell-13-output-6.png)
+![](index_files/figure-commonmark/cell-13-output-5.png)
 
 Finally, we can look at the top losses
 
