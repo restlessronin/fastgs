@@ -4,8 +4,7 @@
 from __future__ import annotations
 
 # %% auto 0
-__all__ = ['BandInputs', 'MSDescriptor', 'createSentinel2Descriptor', 'MSData', 'MaskData', 'MSAugment', 'GSModel', 'GSUnetModel',
-           'FastGS']
+__all__ = ['BandInputs', 'MSDescriptor', 'createSentinel2Descriptor', 'MSData', 'MaskData', 'MSAugment', 'GSUnetModel', 'FastGS']
 
 # %% ../nbs/62_multispectral.ipynb 3
 from typing import Callable
@@ -243,20 +242,12 @@ def create_item_xforms(self: MSAugment) -> list(ItemTransform):
     else: return [TrainMSSAT(self.train_aug),ValidMSSAT(self.valid_aug)]
 
 # %% ../nbs/62_multispectral.ipynb 73
-class GSModel:
-    def create_learner(self, dl, pretrained=False, **kwargs):
-        pass
-    def load_learner(self,model_path,dl):
-        pass
-
-# %% ../nbs/62_multispectral.ipynb 74
-@patch
-def __init__(self: GSModel, model, n_in, n_out, loss_func, metrics):
-    store_attr()
+class GSUnetModel:
+    pass
 
 @patch(cls_method=True)
 def from_all(
-    cls:GSModel,
+    cls:GSUnetModel,
     model,
     ms_data:MSData,
     mask_codes:[str],
@@ -265,9 +256,9 @@ def from_all(
 ):
     return cls(model,len(ms_data.bands.ids),len(mask_codes),loss_func,metrics)
 
-# %% ../nbs/62_multispectral.ipynb 75
-class GSUnetModel(GSModel):
-    pass
+@patch
+def __init__(self: GSUnetModel, model, n_in, n_out, loss_func, metrics):
+    store_attr()
 
 @patch
 def create_learner(self:GSUnetModel,dl,pretrained=False,**kwargs):
@@ -282,16 +273,16 @@ def load_learner(self:GSUnetModel,model_path:str,dl):
     learner.load(model_path)
     return learner
 
-# %% ../nbs/62_multispectral.ipynb 77
+# %% ../nbs/62_multispectral.ipynb 75
 class FastGS:
     pass
 
-# %% ../nbs/62_multispectral.ipynb 78
+# %% ../nbs/62_multispectral.ipynb 76
 @patch
-def __init__(self:FastGS, model:GSModel, ms_data:MSData, mask_data:MaskData, ms_aug:MSAugment):
+def __init__(self:FastGS, model:GSUnetModel, ms_data:MSData, mask_data:MaskData, ms_aug:MSAugment):
     store_attr()
 
-# %% ../nbs/62_multispectral.ipynb 79
+# %% ../nbs/62_multispectral.ipynb 77
 @patch(cls_method=True)
 def for_training(
     cls:FastGS,
@@ -311,7 +302,7 @@ def for_inference(
     model = GSUnetModel.from_all(resnet18,ms_data,mask_codes)
     return cls(model,ms_data,None,None)
 
-# %% ../nbs/62_multispectral.ipynb 81
+# %% ../nbs/62_multispectral.ipynb 79
 @patch
 def create_data_block(self: FastGS, splitter=RandomSplitter(valid_pct=0.2, seed=107)) -> DataBlock:
     return DataBlock(
@@ -320,7 +311,7 @@ def create_data_block(self: FastGS, splitter=RandomSplitter(valid_pct=0.2, seed=
         item_tfms=self.ms_aug.create_item_xforms()
     )
 
-# %% ../nbs/62_multispectral.ipynb 83
+# %% ../nbs/62_multispectral.ipynb 81
 @patch
 def create_learner(self:FastGS,dl,reweight="avg") -> Learner:
     return self.model.create_learner(dl,pretrained=reweight is None,reweight=reweight)
