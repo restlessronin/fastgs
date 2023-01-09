@@ -49,7 +49,7 @@ def get_11b_test_learner():
     fgs = get_11b_test_fgs()
     db = fgs.create_data_block()
     dl = db.dataloaders(source=[66]*10,bs=8)
-    return fgs.create_unet_learner(dl, resnet18)
+    return fgs.create_learner(dl)
 
 def get_11b_test_dl() -> DataBlock:
     "Create data loader with sample inputs repeated nlen times"

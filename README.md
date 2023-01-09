@@ -218,10 +218,15 @@ We create and train a unet learner and look at results. Image is in
 first 4 columns, mask in the 5th and prediction in the 6th.
 
 ``` python
-learner = fastgs.create_unet_learner(dl, resnet18,reweight="avg") # weights of n > 3 channels are set to average of first 3 channels
+learner = fastgs.create_learner(dl,reweight="avg") # weights of n > 3 channels are set to average of first 3 channels
 learner.fit_one_cycle(1)
 learner.show_results(mskovl=False)
 ```
+
+    /opt/homebrew/Caskroom/miniforge/base/envs/fastgs/lib/python3.10/site-packages/torchvision/models/_utils.py:208: UserWarning: The parameter 'pretrained' is deprecated since 0.13 and may be removed in the future, please use 'weights' instead.
+      warnings.warn(
+    /opt/homebrew/Caskroom/miniforge/base/envs/fastgs/lib/python3.10/site-packages/torchvision/models/_utils.py:223: UserWarning: Arguments other than a weight enum or `None` for 'weights' are deprecated since 0.13 and may be removed in the future. The current behavior is equivalent to passing `weights=None`.
+      warnings.warn(msg)
 
 <table border="1" class="dataframe">
   <thead>
@@ -236,15 +241,15 @@ learner.show_results(mskovl=False)
   <tbody>
     <tr>
       <td>0</td>
-      <td>0.812173</td>
-      <td>0.515000</td>
-      <td>0.005123</td>
-      <td>00:25</td>
+      <td>0.872479</td>
+      <td>0.691804</td>
+      <td>0.044623</td>
+      <td>00:27</td>
     </tr>
   </tbody>
 </table>
 
-![](index_files/figure-commonmark/cell-13-output-5.png)
+![](index_files/figure-commonmark/cell-13-output-6.png)
 
 Finally, we can look at the top losses
 

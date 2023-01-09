@@ -24,7 +24,7 @@ def _show_one_sample(img: TensorImageMS, msk: TensorMask, row, mskovl: bool, **k
         return [msk.show(ctx=c,**kwargs) for c in img.show(ctxs=row,**kwargs)]
     else:
         nimgs: int = img.num_images()
-        return img.show(ctxs=row[:nimgs],**kwargs) + [msk.show(ctx=row[nimgs],**kwargs)]
+        return img.show(ctxs=row[:nimgs],**kwargs) + [msk.show(ctx=row[nimgs],title="Mask",**kwargs)]
 
 # %% ../../nbs/08a_vision.data.ipynb 17
 @typedispatch

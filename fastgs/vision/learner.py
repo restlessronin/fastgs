@@ -26,7 +26,7 @@ def _show_one_result(img: TensorImageMS, msk: TensorMask, out: TensorMask, row, 
         return [msk.show(ctx=c, **kwargs) for c in img.show(ctxs=row[:rowl],**kwargs)] + [out.show(ctx=c,**kwargs) for c in img.show(ctxs=row[rowl:],**kwargs)]
     else:
         nimgs: int = img.num_images()
-        return img.show(ctxs=row[:nimgs],**kwargs) + [msk.show(ctx=row[nimgs],**kwargs)] + [out.show(ctx=row[nimgs+1],**kwargs)]
+        return img.show(ctxs=row[:nimgs],**kwargs) + [msk.show(ctx=row[nimgs],title="Mask",**kwargs)] + [out.show(ctx=row[nimgs+1],title="Prediction",**kwargs)]
 
 # %% ../../nbs/21a_vision.learner.ipynb 17
 @typedispatch
